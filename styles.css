@@ -504,10 +504,19 @@ footer .foot-right a:hover {
 
 @media (max-width: 1024px) {
   .hero .wrap {
+    grid-template-columns: 1fr;
     gap: 40px;
+    text-align: center;
+  }
+  .hero-text p {
+    margin: 0 auto 32px;
   }
   .hero-text h1 {
-    font-size: 2.3rem;
+    font-size: 2.5rem;
+  }
+  .hero-img-wrap {
+    max-width: 600px;
+    margin: 0 auto;
   }
   .why-section .wrap {
     grid-template-columns: 1fr;
@@ -519,11 +528,7 @@ footer .foot-right a:hover {
   .why-cards {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    flex-direction: row;
-  }
-  .grid {
-    gap: 16px;
+    gap: 24px;
   }
 }
 
@@ -532,52 +537,57 @@ footer .foot-right a:hover {
     padding: 40px 0;
   }
   .lookbook, .why-section, .bottom-cta {
-    padding: 50px 0;
+    padding: 60px 0;
   }
   
   .nav-right {
     position: fixed;
     top: 0;
-    left: -100%;
-    width: 260px;
+    right: -100%;
+    left: auto;
+    width: 280px;
     height: 100dvh;
     background: #faf8f5;
     flex-direction: column;
-    align-items: flex-start;
-    padding: 72px 28px 28px;
-    gap: 0;
+    align-items: stretch;
+    padding: 80px 24px 32px;
+    gap: 8px;
     z-index: 100;
-    border-right: 1px solid #eae6e1;
-    transition: left 0.35s ease;
+    border-left: 1px solid #eae6e1;
+    border-right: none;
+    transition: right 0.35s ease;
   }
 
   .nav-right.open {
-    left: 0;
+    right: 0;
   }
 
   .nav-right a {
-    font-size: 1rem;
-    padding: 14px 0;
+    font-size: 1.1rem;
+    padding: 16px 8px;
     width: 100%;
     border-bottom: 1px solid #eae6e1;
+    text-align: right;
   }
 
   .nav-right .shop-link {
-    margin-top: 8px;
+    margin-top: 16px;
     text-align: center;
     border-bottom: none;
+    padding: 14px;
   }
 
   .burger {
     display: block;
     z-index: 101;
+    position: relative;
   }
 
   .overlay {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.25);
+    background: rgba(0,0,0,0.4);
     z-index: 99;
   }
 
@@ -585,40 +595,33 @@ footer .foot-right a:hover {
     display: block;
   }
 
-  .hero .wrap {
-    grid-template-columns: 1fr;
-    gap: 36px;
-    text-align: center;
-  }
-
-  .hero-text p {
-    margin: 0 auto 24px;
-  }
-
-  .hero-text h1 {
-    font-size: 2rem;
-  }
-
   .grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
+    max-width: 400px;
+    margin: 0 auto;
+    gap: 32px;
   }
 
   .why-cards {
     grid-template-columns: 1fr;
   }
 
+  .why-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+    padding: 32px 24px;
+  }
+
   footer .wrap {
     flex-direction: column;
-    gap: 12px;
+    gap: 16px;
     text-align: center;
   }
 
-  footer .foot-right a {
-    margin: 0 10px;
-  }
-
   .bottom-cta h2 {
-    font-size: 1.7rem;
+    font-size: 1.8rem;
   }
 
   .back-to-top {
@@ -629,35 +632,18 @@ footer .foot-right a:hover {
 
 @media (max-width: 480px) {
   .hero-text h1 {
-    font-size: 1.7rem;
+    font-size: 2.1rem;
   }
   .hero-text p {
     font-size: 1rem;
   }
-
-  .grid {
-    grid-template-columns: 1fr;
-    max-width: 340px;
-    margin: 0 auto;
-  }
-
   .lookbook-header h2 {
-    font-size: 1.5rem;
+    font-size: 1.6rem;
   }
-
-  .why-section .wrap {
-    gap: 24px;
+  .why-intro h2 {
+    font-size: 1.6rem;
   }
-
-  .why-card {
-    padding: 24px;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 12px;
-  }
-
-  .why-card .why-num {
-    margin-bottom: 8px;
+  .bottom-cta h2 {
+    font-size: 1.6rem;
   }
 }
