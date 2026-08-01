@@ -43,6 +43,9 @@
         <a href="shop.html?category=girls" class="filter-btn" data-cat="girls">بناتي</a>
         <a href="shop.html?category=babies" class="filter-btn" data-cat="babies">رضع</a>
       </div>
+      <div class="shop-search" style="margin-bottom: 36px; text-align: center;">
+        <input type="text" id="search-input" placeholder="ابحثي عن منتج..." style="padding: 12px 20px; width: 100%; max-width: 400px; border-radius: 24px; border: 1px solid #eae6e1; font-family: inherit; font-size: 0.95rem; outline: none;">
+      </div>
 
       <div class="shop-grid" id="products-container"></div>
     </div>
@@ -75,47 +78,60 @@
         }
       });
 
-      var products = await fetchProducts();
-      var filtered = products;
+      var allProducts = await fetchProducts();
+      var currentQuery = '';
 
-      if (category) {
-        filtered = products.filter(function(p) { return p.category === category; });
+      function renderProducts() {
+        var filtered = allProducts;
+        if (category) {
+          filtered = filtered.filter(function(p) { return p.category === category; });
+        }
+        if (currentQuery) {
+          filtered = filtered.filter(function(p) { return p.title.toLowerCase().includes(currentQuery); });
+        }
+
+        container.innerHTML = '';
+
+        if (filtered.length === 0) {
+          container.innerHTML = '<p class="cart-empty-msg" style="grid-column: 1/-1;">لا توجد منتجات مطابقة للبحث.</p>';
+          return;
+        }
+
+        filtered.forEach(function(p) {
+          var card = document.createElement('a');
+          card.href = 'product.html?id=' + p.id;
+          card.className = 'product-card';
+
+          var img = document.createElement('img');
+          img.src = p.image;
+          img.alt = p.title;
+          img.className = 'product-card-img';
+
+          var info = document.createElement('div');
+          info.className = 'product-card-info';
+
+          var title = document.createElement('h3');
+          title.className = 'product-card-title';
+          title.textContent = p.title;
+
+          var price = document.createElement('p');
+          price.className = 'product-card-price';
+          price.textContent = p.price + ' ج.م';
+
+          info.appendChild(title);
+          info.appendChild(price);
+          card.appendChild(img);
+          card.appendChild(info);
+          container.appendChild(card);
+        });
       }
 
-      container.innerHTML = '';
-
-      if (filtered.length === 0) {
-        container.innerHTML = '<p class="cart-empty-msg">لا توجد منتجات في هذا القسم حالياً.</p>';
-        return;
-      }
-
-      filtered.forEach(function(p) {
-        var card = document.createElement('a');
-        card.href = 'product.html?id=' + p.id;
-        card.className = 'product-card';
-
-        var img = document.createElement('img');
-        img.src = p.image;
-        img.alt = p.title;
-        img.className = 'product-card-img';
-
-        var info = document.createElement('div');
-        info.className = 'product-card-info';
-
-        var title = document.createElement('h3');
-        title.className = 'product-card-title';
-        title.textContent = p.title;
-
-        var price = document.createElement('p');
-        price.className = 'product-card-price';
-        price.textContent = p.price + ' ج.م';
-
-        info.appendChild(title);
-        info.appendChild(price);
-        card.appendChild(img);
-        card.appendChild(info);
-        container.appendChild(card);
+      document.getElementById('search-input').addEventListener('input', function(e) {
+        currentQuery = e.target.value.toLowerCase().trim();
+        renderProducts();
       });
+
+      renderProducts();
     });
 
     var burger = document.querySelector('.burger');

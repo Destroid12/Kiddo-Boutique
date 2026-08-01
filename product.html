@@ -42,6 +42,7 @@
       <div id="product-container" class="product-detail">
         <div>
           <img id="p-image" class="product-detail-img" src="" alt="">
+          <div id="p-gallery" style="display:flex; gap:10px; margin-top:16px; overflow-x:auto;"></div>
         </div>
         <div class="product-detail-info">
           <p class="product-detail-price" id="p-price"></p>
@@ -51,7 +52,6 @@
           <label class="product-size-label" for="size">المقاس:</label>
           <select id="size" class="product-size-select"></select>
           <button id="add-to-cart" class="product-add-btn">أضف للسلة</button>
-          <a href="cart.html" class="product-buy-link">اشتري دلوقتي</a>
         </div>
       </div>
     </div>
@@ -91,6 +91,29 @@
       document.getElementById('breadcrumb-name').textContent = currentProduct.title;
       document.getElementById('p-price').textContent = currentProduct.price + ' ج.م';
       document.getElementById('p-desc').textContent = currentProduct.description;
+
+      var gallery = document.getElementById('p-gallery');
+      var images = currentProduct.images || [currentProduct.image];
+      if (images.length > 1) {
+        images.forEach(function(imgUrl) {
+          var thumb = document.createElement('img');
+          thumb.src = imgUrl;
+          thumb.style.width = '70px';
+          thumb.style.height = '90px';
+          thumb.style.objectFit = 'cover';
+          thumb.style.borderRadius = '8px';
+          thumb.style.cursor = 'pointer';
+          thumb.style.border = '2px solid transparent';
+          if (imgUrl === currentProduct.image) thumb.style.borderColor = '#7E7AE0';
+          
+          thumb.addEventListener('click', function() {
+            document.getElementById('p-image').src = imgUrl;
+            Array.from(gallery.children).forEach(function(c) { c.style.borderColor = 'transparent'; });
+            thumb.style.borderColor = '#7E7AE0';
+          });
+          gallery.appendChild(thumb);
+        });
+      }
 
       var sizeSelect = document.getElementById('size');
       currentProduct.sizes.forEach(function(s) {
