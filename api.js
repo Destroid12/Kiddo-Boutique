@@ -24,6 +24,13 @@ async function fetchProductById(id) {
 async function submitOrder(orderData) {
   console.log('Sending order to Google Sheets:', orderData);
   return new Promise(resolve => {
-    setTimeout(() => resolve({ success: true }), 1500);
+    setTimeout(() => {
+      if (orderData.payment === 'paymob') {
+        // In reality, Google Apps Script would return this URL after calling Paymob API
+        resolve({ success: true, paymentUrl: 'https://accept.paymob.com/api/acceptance/iframes/123456?payment_token=MOCK_TOKEN' });
+      } else {
+        resolve({ success: true });
+      }
+    }, 1500);
   });
 }

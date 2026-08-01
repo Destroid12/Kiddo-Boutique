@@ -58,8 +58,11 @@
 
             <div class="checkout-payment">
               <h3 class="checkout-payment-title">طريقة الدفع</h3>
+              <label class="checkout-payment-option" style="margin-bottom: 12px;">
+                <input type="radio" name="payment" value="cod" checked> الدفع عند الاستلام
+              </label>
               <label class="checkout-payment-option">
-                <input type="radio" checked> الدفع عند الاستلام
+                <input type="radio" name="payment" value="paymob"> الدفع أونلاين (Paymob)
               </label>
             </div>
 
@@ -128,10 +131,13 @@
         btn.disabled = true;
         btn.textContent = 'جاري الإرسال...';
 
+        var paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+
         var orderData = {
           name: document.getElementById('c-name').value,
           phone: document.getElementById('c-phone').value,
           address: document.getElementById('c-address').value,
+          payment: paymentMethod,
           items: Cart.items,
           total: Cart.getTotal() + 50
         };
@@ -140,13 +146,17 @@
 
         if (res.success) {
           Cart.clear();
-          document.getElementById('checkout-layout').innerHTML =
-            '<div class="checkout-success">' +
-              '<div class="checkout-success-icon">✓</div>' +
-              '<h2 class="checkout-success-title">تم استلام طلبك بنجاح!</h2>' +
-              '<p class="checkout-success-msg">هنتواصل معاك قريب لتأكيد الطلب وموعد التوصيل.</p>' +
-              '<a href="index.html" class="checkout-success-link">العودة للرئيسية</a>' +
-            '</div>';
+          if (res.paymentUrl) {
+            window.location.href = res.paymentUrl;
+          } else {
+            document.getElementById('checkout-layout').innerHTML =
+              '<div class="checkout-success">' +
+                '<div class="checkout-success-icon">✓</div>' +
+                '<h2 class="checkout-success-title">تم استلام طلبك بنجاح!</h2>' +
+                '<p class="checkout-success-msg">هنتواصل معاك قريب لتأكيد الطلب وموعد التوصيل.</p>' +
+                '<a href="index.html" class="checkout-success-link">العودة للرئيسية</a>' +
+              '</div>';
+          }
         } else {
           alert('حدث خطأ، يرجى المحاولة مرة أخرى.');
           btn.disabled = false;
