@@ -158,7 +158,7 @@
               '</div>';
           }
         } else {
-          alert('حدث خطأ، يرجى المحاولة مرة أخرى.');
+          alert('حدث خطأ: ' + (res.error || 'يرجى المحاولة مرة أخرى.'));
           btn.disabled = false;
           btn.textContent = 'تأكيد الطلب';
         }
