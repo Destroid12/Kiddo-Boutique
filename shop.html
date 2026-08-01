@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>التسوق - Kiddo Boutique</title>
+  <title>الكولكشن - Kiddo Boutique</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -14,9 +14,7 @@
         <a href="shop.html">الكولكشن</a>
         <a href="index.html#why">ليه احنا</a>
         <a href="https://www.facebook.com/share/19TZ1tcnnn/" target="_blank" rel="noopener">صفحتنا</a>
-        <a href="cart.html" class="cart-link">
-          السلة <span class="cart-count" style="display:none">0</span>
-        </a>
+        <a href="cart.html" class="cart-link">السلة <span class="cart-count">0</span></a>
       </div>
       <button class="burger" aria-label="القائمة">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke="currentColor">
@@ -30,19 +28,23 @@
 
   <section class="shop-page">
     <div class="wrap">
-      <div class="shop-header">
-        <h1 id="category-title">كل المنتجات</h1>
-        <div class="shop-filters">
-          <a href="shop.html" class="filter-btn active" data-cat="all">الكل</a>
-          <a href="shop.html?category=boys" class="filter-btn" data-cat="boys">ولادي</a>
-          <a href="shop.html?category=girls" class="filter-btn" data-cat="girls">بناتي</a>
-          <a href="shop.html?category=babies" class="filter-btn" data-cat="babies">رضيع</a>
+      <div class="page-header">
+        <div class="breadcrumb">
+          <a href="index.html">الرئيسية</a>
+          <span>/</span>
+          <span id="breadcrumb-cat">الكولكشن</span>
         </div>
+        <h1 id="category-title">كل المنتجات</h1>
       </div>
-      
-      <div class="shop-grid grid" id="products-container">
-        <div class="loading" style="text-align:center; width:100%; grid-column:1/-1; padding:40px;">جاري التحميل...</div>
+
+      <div class="shop-filters">
+        <a href="shop.html" class="filter-btn active" data-cat="all">الكل</a>
+        <a href="shop.html?category=boys" class="filter-btn" data-cat="boys">ولادي</a>
+        <a href="shop.html?category=girls" class="filter-btn" data-cat="girls">بناتي</a>
+        <a href="shop.html?category=babies" class="filter-btn" data-cat="babies">رضع</a>
       </div>
+
+      <div class="shop-grid" id="products-container"></div>
     </div>
   </section>
 
@@ -55,57 +57,75 @@
   <script src="api.js"></script>
   <script src="cart.js"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const category = urlParams.get('category');
-      
-      const titleEl = document.getElementById('category-title');
-      const container = document.getElementById('products-container');
-      const filters = document.querySelectorAll('.filter-btn');
-      
-      filters.forEach(btn => {
+    document.addEventListener('DOMContentLoaded', async function() {
+      var urlParams = new URLSearchParams(window.location.search);
+      var category = urlParams.get('category');
+
+      var titleEl = document.getElementById('category-title');
+      var breadcrumbCat = document.getElementById('breadcrumb-cat');
+      var container = document.getElementById('products-container');
+      var filters = document.querySelectorAll('.filter-btn');
+
+      filters.forEach(function(btn) {
         btn.classList.remove('active');
         if (category === btn.getAttribute('data-cat') || (!category && btn.getAttribute('data-cat') === 'all')) {
           btn.classList.add('active');
           titleEl.textContent = btn.textContent;
+          breadcrumbCat.textContent = btn.textContent;
         }
       });
 
-      const products = await fetchProducts();
-      let filtered = products;
-      
+      var products = await fetchProducts();
+      var filtered = products;
+
       if (category) {
-        filtered = products.filter(p => p.category === category);
+        filtered = products.filter(function(p) { return p.category === category; });
       }
-      
+
       container.innerHTML = '';
-      
+
       if (filtered.length === 0) {
-        container.innerHTML = '<p style="grid-column:1/-1; text-align:center;">لا توجد منتجات في هذا القسم حالياً.</p>';
+        container.innerHTML = '<p class="cart-empty-msg">لا توجد منتجات في هذا القسم حالياً.</p>';
         return;
       }
 
-      filtered.forEach(p => {
-        const item = document.createElement('a');
-        item.href = `product.html?id=${p.id}`;
-        item.className = 'grid-item reveal visible';
-        item.innerHTML = `
-          <img src="${p.image}" alt="${p.title}">
-          <span class="price-tag">${p.price} ج.م</span>
-          <span class="label" style="margin-top: 8px; display:block; text-align:right;">${p.title}</span>
-        `;
-        container.appendChild(item);
+      filtered.forEach(function(p) {
+        var card = document.createElement('a');
+        card.href = 'product.html?id=' + p.id;
+        card.className = 'product-card';
+
+        var img = document.createElement('img');
+        img.src = p.image;
+        img.alt = p.title;
+        img.className = 'product-card-img';
+
+        var info = document.createElement('div');
+        info.className = 'product-card-info';
+
+        var title = document.createElement('h3');
+        title.className = 'product-card-title';
+        title.textContent = p.title;
+
+        var price = document.createElement('p');
+        price.className = 'product-card-price';
+        price.textContent = p.price + ' ج.م';
+
+        info.appendChild(title);
+        info.appendChild(price);
+        card.appendChild(img);
+        card.appendChild(info);
+        container.appendChild(card);
       });
     });
-    
-    const burger = document.querySelector('.burger');
-    const navRight = document.querySelector('.nav-right');
-    const overlay = document.querySelector('.overlay');
-    burger.addEventListener('click', () => {
+
+    var burger = document.querySelector('.burger');
+    var navRight = document.querySelector('.nav-right');
+    var overlay = document.querySelector('.overlay');
+    burger.addEventListener('click', function() {
       navRight.classList.toggle('open');
       overlay.classList.toggle('show');
     });
-    overlay.addEventListener('click', () => {
+    overlay.addEventListener('click', function() {
       navRight.classList.remove('open');
       overlay.classList.remove('show');
     });
