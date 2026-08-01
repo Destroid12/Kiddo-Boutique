@@ -46,7 +46,7 @@
         </div>
         <div class="product-detail-info">
           <p class="product-detail-price" id="p-price"></p>
-          <p class="product-stock">متوفر في المخزون</p>
+          <p class="product-stock" id="p-stock">متوفر في المخزون</p>
           <p class="product-detail-desc" id="p-desc"></p>
           <hr class="product-detail-divider">
           <label class="product-size-label" for="size">المقاس:</label>
@@ -91,6 +91,22 @@
       document.getElementById('breadcrumb-name').textContent = currentProduct.title;
       document.getElementById('p-price').textContent = currentProduct.price + ' ج.م';
       document.getElementById('p-desc').textContent = currentProduct.description;
+
+      var stockEl = document.getElementById('p-stock');
+      var addBtn = document.getElementById('add-to-cart');
+      if (currentProduct.status === 'out_of_stock') {
+        stockEl.textContent = 'نفذت الكمية';
+        stockEl.style.color = '#e74c3c';
+        stockEl.style.background = '#fdedec';
+        stockEl.style.padding = '4px 10px';
+        stockEl.style.borderRadius = '12px';
+        stockEl.style.display = 'inline-block';
+        
+        addBtn.disabled = true;
+        addBtn.textContent = 'غير متوفر حالياً';
+        addBtn.style.opacity = '0.5';
+        addBtn.style.cursor = 'not-allowed';
+      }
 
       var gallery = document.getElementById('p-gallery');
       var images = currentProduct.images || [currentProduct.image];

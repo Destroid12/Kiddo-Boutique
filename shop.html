@@ -122,6 +122,22 @@
           info.appendChild(price);
           card.appendChild(img);
           card.appendChild(info);
+
+          if (p.status === 'out_of_stock') {
+            var badge = document.createElement('span');
+            badge.textContent = 'نفذت الكمية';
+            badge.style.position = 'absolute';
+            badge.style.top = '10px';
+            badge.style.right = '10px';
+            badge.style.background = '#e74c3c';
+            badge.style.color = 'white';
+            badge.style.padding = '4px 10px';
+            badge.style.borderRadius = '12px';
+            badge.style.fontSize = '0.8rem';
+            card.appendChild(badge);
+            card.style.position = 'relative';
+          }
+
           container.appendChild(card);
         });
       }

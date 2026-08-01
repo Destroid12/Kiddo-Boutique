@@ -28,3 +28,20 @@ async function submitOrder(orderData) {
     return { success: false };
   }
 }
+
+async function adminAction(action, payloadData, password) {
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        admin_action: action,
+        password: password,
+        payload: payloadData
+      })
+    });
+    return await res.json();
+  } catch(e) {
+    console.error("Admin action failed:", e);
+    return { success: false, error: e.toString() };
+  }
+}

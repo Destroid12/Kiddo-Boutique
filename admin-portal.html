@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لوحة التحكم - Kiddo Boutique</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .admin-container {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      border-bottom: 1px solid #eae6e1;
+      padding-bottom: 20px;
+    }
+    .admin-login {
+      max-width: 400px;
+      margin: 100px auto;
+      text-align: center;
+      padding: 40px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    .admin-table th, .admin-table td {
+      padding: 12px;
+      text-align: right;
+      border-bottom: 1px solid #eae6e1;
+    }
+    .admin-table th {
+      background: #faf8f5;
+      color: #2c2c2c;
+    }
+    .admin-btn {
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.9rem;
+      transition: opacity 0.2s;
+    }
+    .admin-btn:hover { opacity: 0.8; }
+    .btn-danger { background: #ff4d4d; color: white; }
+    .btn-warning { background: #f39c12; color: white; }
+    .btn-success { background: #7E7AE0; color: white; }
+    
+    .add-form {
+      background: #faf8f5;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+      display: none;
+    }
+    .add-form.active { display: block; }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: inherit;
+    }
+    .badge {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+    }
+    .badge-in { background: #e8f8f5; color: #1abc9c; }
+    .badge-out { background: #fdedec; color: #e74c3c; }
+  </style>
+</head>
+<body style="background: #faf8f5;">
+
+  <div id="login-screen" class="admin-login">
+    <h2 style="margin-bottom: 20px;">دخول الإدارة المشفر</h2>
+    <input type="password" id="admin-pwd" placeholder="كلمة المرور" style="width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 6px;">
+    <button onclick="login()" class="checkout-submit-btn">دخول</button>
+  </div>
+
+  <div id="dashboard-screen" class="admin-container" style="display: none;">
+    <div class="admin-header">
+      <h2>لوحة تحكم المنتجات</h2>
+      <div>
+        <button onclick="toggleAddForm()" class="admin-btn btn-success">+ إضافة منتج جديد</button>
+        <button onclick="logout()" class="admin-btn btn-danger" style="margin-right: 10px;">خروج</button>
+      </div>
+    </div>
+
+    <div id="add-form" class="add-form">
+      <h3 style="margin-bottom: 15px;">إضافة منتج</h3>
+      <form id="newProductForm" onsubmit="handleAdd(event)">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>اسم المنتج</label>
+            <input type="text" id="n-title" required>
+          </div>
+          <div class="form-group">
+            <label>القسم</label>
+            <select id="n-cat" required>
+              <option value="boys">ولادي</option>
+              <option value="girls">بناتي</option>
+              <option value="babies">رضع</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>السعر (ج.م)</label>
+            <input type="number" id="n-price" required>
+          </div>
+          <div class="form-group">
+            <label>المقاسات (مفصولة بفاصلة)</label>
+            <input type="text" id="n-sizes" placeholder="مثال: 2Y, 4Y, 6Y" required>
+          </div>
+          <div class="form-group">
+            <label>رابط الصورة الرئيسية</label>
+            <input type="url" id="n-image" required>
+          </div>
+          <div class="form-group">
+            <label>روابط صور إضافية (مفصولة بفاصلة)</label>
+            <input type="text" id="n-images">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>الوصف</label>
+          <textarea id="n-desc" rows="3" required></textarea>
+        </div>
+        <button type="submit" class="admin-btn btn-success" id="add-btn">حفظ المنتج</button>
+      </form>
+    </div>
+
+    <div style="overflow-x: auto;">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>صورة</th>
+            <th>الاسم</th>
+            <th>القسم</th>
+            <th>السعر</th>
+            <th>الحالة</th>
+            <th>إجراءات</th>
+          </tr>
+        </thead>
+        <tbody id="admin-table-body">
+          <tr><td colspan="6" style="text-align:center;">جاري التحميل...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="api.js"></script>
+  <script>
+    var pwd = sessionStorage.getItem('admin_pwd');
+    if (pwd) {
+      showDashboard();
+    }
+
+    function login() {
+      var val = document.getElementById('admin-pwd').value;
+      if (val.trim()) {
+        sessionStorage.setItem('admin_pwd', val);
+        pwd = val;
+        showDashboard();
+      }
+    }
+
+    function logout() {
+      sessionStorage.removeItem('admin_pwd');
+      window.location.reload();
+    }
+
+    function toggleAddForm() {
+      document.getElementById('add-form').classList.toggle('active');
+    }
+
+    async function showDashboard() {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('dashboard-screen').style.display = 'block';
+      loadTable();
+    }
+
+    async function loadTable() {
+      var products = await fetchProducts();
+      var tbody = document.getElementById('admin-table-body');
+      tbody.innerHTML = '';
+      
+      if (products.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">لا توجد منتجات.</td></tr>';
+        return;
+      }
+
+      products.forEach(function(p) {
+        var tr = document.createElement('tr');
+        var isOut = p.status === 'out_of_stock';
+        
+        tr.innerHTML = 
+          '<td><img src="' + p.image + '" style="width:40px; height:50px; object-fit:cover; border-radius:4px;"></td>' +
+          '<td>' + p.title + '</td>' +
+          '<td>' + p.category + '</td>' +
+          '<td>' + p.price + '</td>' +
+          '<td><span class="badge ' + (isOut ? 'badge-out' : 'badge-in') + '">' + (isOut ? 'نفذت الكمية' : 'متوفر') + '</span></td>' +
+          '<td>' +
+            '<button onclick="toggleStock(\'' + p.id + '\', ' + isOut + ')" class="admin-btn ' + (isOut ? 'btn-success' : 'btn-warning') + '" style="margin-left:5px;">' + (isOut ? 'إعادة توفير' : 'إخفاء') + '</button>' +
+            '<button onclick="deleteProd(\'' + p.id + '\')" class="admin-btn btn-danger">حذف</button>' +
+          '</td>';
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function handleAdd(e) {
+      e.preventDefault();
+      var btn = document.getElementById('add-btn');
+      btn.disabled = true;
+      btn.textContent = 'جاري الحفظ...';
+
+      var newProd = {
+        title: document.getElementById('n-title').value,
+        category: document.getElementById('n-cat').value,
+        price: document.getElementById('n-price').value,
+        sizes: document.getElementById('n-sizes').value,
+        image: document.getElementById('n-image').value,
+        images: document.getElementById('n-images').value,
+        description: document.getElementById('n-desc').value,
+      };
+
+      var res = await adminAction('add_product', newProd, pwd);
+      if (res.success) {
+        document.getElementById('newProductForm').reset();
+        toggleAddForm();
+        loadTable();
+      } else {
+        alert('خطأ: ' + (res.error || 'تأكد من صحة كلمة المرور'));
+        if (res.error === 'Unauthorized') logout();
+      }
+      btn.disabled = false;
+      btn.textContent = 'حفظ المنتج';
+    }
+
+    async function toggleStock(id, currentlyOut) {
+      if(!confirm('هل أنت متأكد من تغيير حالة المنتج؟')) return;
+      var newStatus = currentlyOut ? 'in_stock' : 'out_of_stock';
+      var res = await adminAction('toggle_stock', { id: id, status: newStatus }, pwd);
+      if (res.success) {
+        loadTable();
+      } else {
+        alert('خطأ: ' + (res.error || 'غير مصرح'));
+        if (res.error === 'Unauthorized') logout();
+      }
+    }
+
+    async function deleteProd(id) {
+      if(!confirm('هل أنت متأكد من حذف المنتج نهائياً؟')) return;
+      var res = await adminAction('delete_product', { id: id }, pwd);
+      if (res.success) {
+        loadTable();
+      } else {
+        alert('خطأ: ' + (res.error || 'غير مصرح'));
+        if (res.error === 'Unauthorized') logout();
+      }
+    }
+  </script>
+</body>
+</html>
