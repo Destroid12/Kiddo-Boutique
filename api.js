@@ -2,7 +2,7 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbySA-TU9jnVFQYDeku6m
 
 async function fetchProducts() {
   try {
-    const res = await fetch(SCRIPT_URL);
+    const res = await fetch(SCRIPT_URL, { cache: 'no-store' });
     return await res.json();
   } catch(e) {
     console.error("Error fetching products:", e);
