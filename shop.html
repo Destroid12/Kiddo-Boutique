@@ -116,7 +116,12 @@
 
           var price = document.createElement('p');
           price.className = 'product-card-price';
-          price.textContent = p.price + ' ج.م';
+          var pricesList = String(p.price).split(',').map(function(s) { return s.trim(); });
+          if(pricesList.length > 1) {
+            price.textContent = 'يبدأ من ' + pricesList[0] + ' ج.م';
+          } else {
+            price.textContent = p.price + ' ج.م';
+          }
 
           info.appendChild(title);
           info.appendChild(price);

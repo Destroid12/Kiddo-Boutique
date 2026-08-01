@@ -89,7 +89,9 @@
       document.getElementById('p-image').alt = currentProduct.title;
       document.getElementById('p-title').textContent = currentProduct.title;
       document.getElementById('breadcrumb-name').textContent = currentProduct.title;
-      document.getElementById('p-price').textContent = currentProduct.price + ' ج.م';
+      
+      window.productPrices = String(currentProduct.price).split(',').map(function(p) { return p.trim(); });
+      document.getElementById('p-price').textContent = window.productPrices[0] + ' ج.م';
       document.getElementById('p-desc').textContent = currentProduct.description;
 
       var stockEl = document.getElementById('p-stock');
@@ -132,16 +134,27 @@
       }
 
       var sizeSelect = document.getElementById('size');
-      currentProduct.sizes.forEach(function(s) {
+      currentProduct.sizes.forEach(function(s, idx) {
         var opt = document.createElement('option');
         opt.value = s;
+        opt.dataset.price = window.productPrices[idx] || window.productPrices[0];
         opt.textContent = s;
         sizeSelect.appendChild(opt);
       });
 
+      sizeSelect.addEventListener('change', function() {
+        var selectedOpt = sizeSelect.options[sizeSelect.selectedIndex];
+        document.getElementById('p-price').textContent = selectedOpt.dataset.price + ' ج.م';
+      });
+
       document.getElementById('add-to-cart').addEventListener('click', function() {
-        var selectedSize = sizeSelect.value;
-        Cart.add(currentProduct, selectedSize);
+        var selectedOpt = sizeSelect.options[sizeSelect.selectedIndex];
+        var specificPrice = Number(selectedOpt.dataset.price);
+        
+        var productToCart = Object.assign({}, currentProduct);
+        productToCart.price = specificPrice;
+        
+        Cart.add(productToCart, selectedOpt.value);
       });
     });
 

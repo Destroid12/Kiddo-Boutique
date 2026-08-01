@@ -54,14 +54,9 @@
               <input type="tel" id="c-phone" class="checkout-input" required>
             </div>
             <div class="checkout-field">
-              <label class="checkout-label">العنوان بالتفصيل</label>
-              <textarea id="c-address" class="checkout-textarea" rows="3" required></textarea>
-            </div>
-            
-            <div class="checkout-field">
-              <label class="checkout-label">حدد موقعك على الخريطة (لتسهيل التوصيل)</label>
+              <label class="checkout-label">حدد موقعك على الخريطة</label>
               <div id="map" style="height: 250px; border-radius: 8px; border: 1px solid #ddd; z-index: 1;"></div>
-              <p style="font-size: 0.8rem; color: #666; margin-top: 5px;">اسحب العلامة الزرقاء لتحديد موقعك بدقة</p>
+              <p style="font-size: 0.8rem; color: #666; margin-top: 5px;">اسحب العلامة الزرقاء لتحديد موقعك بدقة (إجباري لتوصيل الطلب)</p>
             </div>
 
             <div class="checkout-payment">
@@ -141,10 +136,14 @@
 
         var paymentMethod = document.querySelector('input[name="payment"]:checked').value;
 
-        var fullAddress = document.getElementById('c-address').value;
-        if (window.mapLocation) {
-          fullAddress += '\nرابط الخريطة: https://www.google.com/maps/search/?api=1&query=' + window.mapLocation;
+        if (!window.mapLocation) {
+          alert('الرجاء تحديد موقعك على الخريطة أولاً!');
+          btn.disabled = false;
+          btn.textContent = 'تأكيد الطلب';
+          return;
         }
+
+        var fullAddress = 'https://www.google.com/maps/search/?api=1&query=' + window.mapLocation;
 
         var orderData = {
           name: document.getElementById('c-name').value,
