@@ -121,6 +121,10 @@
         </div>
       </div>
       
+      <div style="margin-bottom: 20px;">
+        <input type="text" id="order-search" placeholder="بحث باسم العميل أو رقم الهاتف..." onkeyup="filterOrders()" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit;">
+      </div>
+      
       <div style="overflow-x: auto;">
         <table class="admin-table">
           <thead>
@@ -216,7 +220,7 @@
       orders.forEach(function(o, index) {
         // o is [timestamp, name, phone, address, total, payment_method, items, paymob_order_id, status]
         var status = o[8] || 'Pending';
-        if (status === 'Confirmed') totalSales += Number(o[4]);
+        if (status === 'Confirmed' || status === 'Paid') totalSales += Number(o[4]);
         if (status === 'Pending') pendingCount++;
         
         var badgeClass = status === 'Confirmed' ? 'badge-in' : (status === 'Cancelled' ? 'badge-out' : 'badge');
@@ -224,18 +228,22 @@
         if(status === 'Paid') badgeClass = 'badge-in';
         if(status === 'Failed') badgeClass = 'badge-out';
 
+        var paymentMethod = o[5] === 'paymob' ? 'دفع إلكتروني (Paymob)' : (o[5] === 'cod' ? 'نقداً عند الاستلام' : o[5]);
+        var addressHTML = String(o[3]).replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color:#7E7AE0; text-decoration:underline;">$1</a>').replace(/\n/g, '<br>');
+
         var tr = document.createElement('tr');
         tr.innerHTML = 
           '<td>' + new Date(o[0]).toLocaleDateString() + '</td>' +
-          '<td>' + o[1] + '<br><small>' + o[3] + '</small></td>' +
+          '<td>' + o[1] + '<br><small>' + addressHTML + '</small></td>' +
           '<td dir="ltr">' + o[2] + '</td>' +
-          '<td>' + o[5] + '</td>' +
+          '<td>' + paymentMethod + '</td>' +
           '<td><pre style="font-family:inherit; margin:0; font-size:0.8rem;">' + o[6] + '</pre></td>' +
           '<td>' + o[4] + '</td>' +
           '<td><span class="badge ' + badgeClass + '">' + status + '</span></td>' +
           '<td>' +
             '<button onclick="updateOrder(' + (index + 2) + ', \'Confirmed\')" class="admin-btn btn-success">تأكيد</button>' +
-            '<button onclick="updateOrder(' + (index + 2) + ', \'Cancelled\')" class="admin-btn btn-danger">إلغاء</button>' +
+            '<button onclick="updateOrder(' + (index + 2) + ', \'Cancelled\')" class="admin-btn btn-warning">إلغاء</button>' +
+            '<button onclick="deleteOrder(' + (index + 2) + ')" class="admin-btn btn-danger">حذف</button>' +
           '</td>';
         tbody.appendChild(tr);
       });
@@ -288,6 +296,29 @@
       if(!confirm('هل أنت متأكد من تغيير حالة الطلب إلى ' + newStatus + '؟')) return;
       var res = await adminAction('update_order', { rowIndex: rowIndex, status: newStatus }, pwd);
       if (res.success) { loadOrders(); } else { alert('خطأ: ' + (res.error || 'غير مصرح')); }
+    }
+
+    async function deleteOrder(rowIndex) {
+      if(!confirm('هل أنت متأكد من حذف الطلب نهائياً؟')) return;
+      var res = await adminAction('delete_order', { rowIndex: rowIndex }, pwd);
+      if (res.success) { loadOrders(); } else { alert('خطأ: ' + (res.error || 'غير مصرح')); }
+    }
+
+    function filterOrders() {
+      var filter = document.getElementById('order-search').value.toLowerCase();
+      var rows = document.getElementById('orders-table-body').getElementsByTagName('tr');
+      for (var i = 0; i < rows.length; i++) {
+        var nameCol = rows[i].getElementsByTagName('td')[1];
+        var phoneCol = rows[i].getElementsByTagName('td')[2];
+        if (nameCol || phoneCol) {
+          var textValue = (nameCol.textContent || nameCol.innerText) + " " + (phoneCol.textContent || phoneCol.innerText);
+          if (textValue.toLowerCase().indexOf(filter) > -1) {
+            rows[i].style.display = "";
+          } else {
+            rows[i].style.display = "none";
+          }
+        }
+      }
     }
   </script>
 </body>
