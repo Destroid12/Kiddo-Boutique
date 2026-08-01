@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>المنتج - Kiddo Boutique</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav>
+    <div class="wrap">
+      <a href="index.html" class="logo">Kiddo Boutique</a>
+      <div class="nav-right">
+        <a href="shop.html">الكولكشن</a>
+        <a href="index.html#why">ليه احنا</a>
+        <a href="https://www.facebook.com/share/19TZ1tcnnn/" target="_blank" rel="noopener">صفحتنا</a>
+        <a href="cart.html" class="cart-link">
+          السلة <span class="cart-count" style="display:none">0</span>
+        </a>
+      </div>
+      <button class="burger" aria-label="القائمة">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke="currentColor">
+          <line x1="4" y1="7" x2="20" y2="7"/>
+          <line x1="4" y1="17" x2="20" y2="17"/>
+        </svg>
+      </button>
+    </div>
+  </nav>
+  <div class="overlay"></div>
+
+  <section class="product-page" style="padding: 60px 0;">
+    <div class="wrap">
+      <div id="loading" style="text-align:center; padding: 40px;">جاري التحميل...</div>
+      
+      <div id="product-container" class="product-layout" style="display:none;">
+        <div class="product-image">
+          <img id="p-image" src="" alt="">
+        </div>
+        
+        <div class="product-info">
+          <h1 id="p-title"></h1>
+          <p class="price" id="p-price"></p>
+          <div class="description" id="p-desc"></div>
+        </div>
+        
+        <div class="buy-box">
+          <h3 class="buy-price" id="b-price"></h3>
+          <p class="stock" style="color: #2e8b57; font-weight: bold; margin-bottom: 16px;">متوفر في المخزون</p>
+          
+          <div class="size-selector" style="margin-bottom: 24px;">
+            <label for="size" style="display:block; margin-bottom: 8px; font-weight:600;">المقاس:</label>
+            <select id="size" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-family:inherit;"></select>
+          </div>
+          
+          <button id="add-to-cart" class="cta" style="width:100%; margin-bottom:12px; border:none; cursor:pointer;">أضف إلى السلة</button>
+          <a href="cart.html" class="cta-secondary" style="display:block; width:100%; text-align:center;">إتمام الطلب الآن</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <span class="foot-left">© 2026 Kiddo Boutique</span>
+    </div>
+  </footer>
+
+  <script src="api.js"></script>
+  <script src="cart.js"></script>
+  <script>
+    let currentProduct = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const id = urlParams.get('id');
+      
+      if (!id) {
+        document.getElementById('loading').textContent = 'المنتج غير موجود.';
+        return;
+      }
+
+      currentProduct = await fetchProductById(id);
+      
+      if (!currentProduct) {
+        document.getElementById('loading').textContent = 'المنتج غير موجود.';
+        return;
+      }
+
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('product-container').style.display = 'grid'; // will be styled in css
+      
+      document.title = currentProduct.title + ' - Kiddo Boutique';
+      document.getElementById('p-image').src = currentProduct.image;
+      document.getElementById('p-image').alt = currentProduct.title;
+      document.getElementById('p-title').textContent = currentProduct.title;
+      document.getElementById('p-price').textContent = currentProduct.price + ' ج.م';
+      document.getElementById('p-desc').textContent = currentProduct.description;
+      document.getElementById('b-price').textContent = currentProduct.price + ' ج.م';
+      
+      const sizeSelect = document.getElementById('size');
+      currentProduct.sizes.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s;
+        opt.textContent = s;
+        sizeSelect.appendChild(opt);
+      });
+      
+      document.getElementById('add-to-cart').addEventListener('click', () => {
+        const selectedSize = sizeSelect.value;
+        Cart.add(currentProduct, selectedSize);
+      });
+    });
+    
+    // Burger menu logic
+    const burger = document.querySelector('.burger');
+    const navRight = document.querySelector('.nav-right');
+    const overlay = document.querySelector('.overlay');
+    burger.addEventListener('click', () => {
+      navRight.classList.toggle('open');
+      overlay.classList.toggle('show');
+    });
+    overlay.addEventListener('click', () => {
+      navRight.classList.remove('open');
+      overlay.classList.remove('show');
+    });
+  </script>
+</body>
+</html>

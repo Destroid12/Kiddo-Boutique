@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>السلة - Kiddo Boutique</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav>
+    <div class="wrap">
+      <a href="index.html" class="logo">Kiddo Boutique</a>
+      <div class="nav-right">
+        <a href="shop.html">الكولكشن</a>
+        <a href="index.html#why">ليه احنا</a>
+        <a href="https://www.facebook.com/share/19TZ1tcnnn/" target="_blank" rel="noopener">صفحتنا</a>
+        <a href="cart.html" class="cart-link" style="color: #2c2c2c; font-weight:bold;">
+          السلة <span class="cart-count" style="display:none">0</span>
+        </a>
+      </div>
+      <button class="burger" aria-label="القائمة">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke="currentColor">
+          <line x1="4" y1="7" x2="20" y2="7"/>
+          <line x1="4" y1="17" x2="20" y2="17"/>
+        </svg>
+      </button>
+    </div>
+  </nav>
+  <div class="overlay"></div>
+
+  <section class="cart-page" style="padding: 60px 0; min-height: 60vh;">
+    <div class="wrap">
+      <h1 style="margin-bottom: 30px; font-family:'Noto Kufi Arabic', sans-serif;">سلة المشتريات</h1>
+      
+      <div id="cart-container" class="cart-layout">
+        
+        <div class="cart-items" id="cart-items">
+          <!-- JS fills this -->
+        </div>
+        
+        <div class="cart-summary" id="cart-summary" style="display:none;">
+          <h3 style="margin-bottom: 20px; font-family:'Noto Kufi Arabic', sans-serif;">ملخص الطلب</h3>
+          <div class="summary-line" style="display:flex; justify-content:space-between; margin-bottom:12px;">
+            <span style="color:#7a7a7a;">المجموع:</span>
+            <span id="cart-total-price" style="font-weight:bold;"></span>
+          </div>
+          <div class="summary-line" style="display:flex; justify-content:space-between; margin-bottom:12px;">
+            <span style="color:#7a7a7a;">الشحن:</span>
+            <span style="font-weight:bold;">يحدد في الخطوة التالية</span>
+          </div>
+          <hr style="margin: 20px 0; border:0; border-top:1px solid #eae6e1;">
+          <div class="summary-line" style="display:flex; justify-content:space-between; margin-bottom:24px; font-size:1.1rem;">
+            <span style="font-weight:bold;">الإجمالي:</span>
+            <span id="cart-final-price" style="font-weight:bold; color:#7E7AE0;"></span>
+          </div>
+          <a href="checkout.html" class="cta" style="display:block; width:100%; text-align:center; padding:16px; border-radius:8px;">متابعة الشراء</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <span class="foot-left">© 2026 Kiddo Boutique</span>
+    </div>
+  </footer>
+
+  <script src="cart.js"></script>
+  <script>
+    function renderCart() {
+      const itemsContainer = document.getElementById('cart-items');
+      const summary = document.getElementById('cart-summary');
+      const totalEl = document.getElementById('cart-total-price');
+      const finalEl = document.getElementById('cart-final-price');
+
+      itemsContainer.innerHTML = '';
+
+      if (Cart.items.length === 0) {
+        itemsContainer.innerHTML = `
+          <div style="text-align:center; padding: 40px; background: white; border-radius: 12px; border: 1px solid #eae6e1;">
+            <p style="margin-bottom: 20px; color:#7a7a7a;">السلة فارغة حالياً.</p>
+            <a href="shop.html" class="cta">تسوق الآن</a>
+          </div>
+        `;
+        summary.style.display = 'none';
+        return;
+      }
+
+      summary.style.display = 'block';
+
+      Cart.items.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'cart-item-row';
+        row.innerHTML = `
+          <img src="${item.image}" alt="${item.title}">
+          <div class="ci-details">
+            <a href="product.html?id=${item.id}" class="ci-title">${item.title}</a>
+            <p class="ci-size">المقاس: ${item.size}</p>
+            <p class="ci-price">${item.price} ج.م</p>
+          </div>
+          <div class="ci-actions">
+            <input type="number" min="1" value="${item.quantity}" data-id="${item.id}" data-size="${item.size}" class="qty-input">
+            <button class="remove-btn" data-id="${item.id}" data-size="${item.size}">حذف</button>
+          </div>
+        `;
+        itemsContainer.appendChild(row);
+      });
+
+      const total = Cart.getTotal();
+      totalEl.textContent = total + ' ج.م';
+      finalEl.textContent = total + ' ج.م';
+      
+      // Bind events
+      document.querySelectorAll('.qty-input').forEach(input => {
+        input.addEventListener('change', (e) => {
+          Cart.updateQuantity(e.target.dataset.id, e.target.dataset.size, e.target.value);
+          renderCart();
+        });
+      });
+
+      document.querySelectorAll('.remove-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          Cart.remove(e.target.dataset.id, e.target.dataset.size);
+          renderCart();
+        });
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Small timeout to ensure Cart is initialized from cart.js DOMContentLoaded
+      setTimeout(renderCart, 50);
+    });
+    
+    // Burger menu
+    const burger = document.querySelector('.burger');
+    const navRight = document.querySelector('.nav-right');
+    const overlay = document.querySelector('.overlay');
+    burger.addEventListener('click', () => {
+      navRight.classList.toggle('open');
+      overlay.classList.toggle('show');
+    });
+    overlay.addEventListener('click', () => {
+      navRight.classList.remove('open');
+      overlay.classList.remove('show');
+    });
+  </script>
+</body>
+</html>
