@@ -69,13 +69,29 @@
       var container = document.getElementById('products-container');
       var filters = document.querySelectorAll('.filter-btn');
 
+      function updateFilterUI(cat) {
+        filters.forEach(function(btn) {
+          btn.classList.remove('active');
+          if (cat === btn.getAttribute('data-cat') || (!cat && btn.getAttribute('data-cat') === 'all')) {
+            btn.classList.add('active');
+            titleEl.textContent = btn.textContent;
+            breadcrumbCat.textContent = btn.textContent;
+          }
+        });
+      }
+
+      updateFilterUI(category);
+
       filters.forEach(function(btn) {
-        btn.classList.remove('active');
-        if (category === btn.getAttribute('data-cat') || (!category && btn.getAttribute('data-cat') === 'all')) {
-          btn.classList.add('active');
-          titleEl.textContent = btn.textContent;
-          breadcrumbCat.textContent = btn.textContent;
-        }
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          var cat = btn.getAttribute('data-cat');
+          category = (cat === 'all') ? null : cat;
+          updateFilterUI(category);
+          var newUrl = category ? ('shop.html?category=' + category) : 'shop.html';
+          history.pushState(null, '', newUrl);
+          renderProducts();
+        });
       });
 
       var allProducts = await fetchProducts();
