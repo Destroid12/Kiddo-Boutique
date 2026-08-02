@@ -61,11 +61,34 @@
 
             <div class="checkout-payment">
               <h3 class="checkout-payment-title">طريقة الدفع</h3>
-              <label class="checkout-payment-option" style="margin-bottom: 12px;">
-                <input type="radio" name="payment" value="cod" checked> الدفع عند الاستلام
+              <label class="checkout-payment-option" style="margin-bottom: 12px; cursor: pointer;">
+                <input type="radio" name="payment" value="cod" checked onchange="togglePaymentBox()"> 
+                <span>💵 الدفع عند الاستلام</span>
               </label>
-              <label class="checkout-payment-option">
-                <input type="radio" name="payment" value="paymob"> الدفع أونلاين (Paymob)
+              
+              <label class="checkout-payment-option" style="margin-bottom: 12px; cursor: pointer;">
+                <input type="radio" name="payment" value="instapay" onchange="togglePaymentBox()"> 
+                <span>⚡ إنستاباي (InstaPay)</span>
+              </label>
+
+              <!-- InstaPay Transfer Info Box -->
+              <div id="instapay-box" style="display: none; background: #fdfaf6; border: 1.5px dashed #7E7AE0; border-radius: 10px; padding: 18px; margin-bottom: 16px;">
+                <p style="font-size: 0.92rem; font-weight: 700; color: #2c2c2c; margin-bottom: 8px;">
+                  📲 حوّل المبلغ الإجمالي لحساب إنستاباي التالي:
+                </p>
+                <div style="display: flex; align-items: center; justify-content: space-between; background: white; border: 1px solid #eae6e1; border-radius: 8px; padding: 10px 14px; margin-bottom: 14px;">
+                  <span id="instapay-account" style="font-weight: 700; color: #7E7AE0; direction: ltr; font-size: 1rem;">kiddoboutique@instapay</span>
+                  <button type="button" id="copy-instapay-btn" onclick="copyInstaPay()" style="background: #7E7AE0; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-size: 0.85rem; cursor: pointer; font-family: inherit; font-weight: 600;">نسخ</button>
+                </div>
+                <div class="checkout-field" style="margin-bottom: 0;">
+                  <label class="checkout-label" style="font-size: 0.88rem;">اسم صاحب الحساب المحوّل منه أو رقم الهاتف للتأكيد:</label>
+                  <input type="text" id="c-instapay-sender" class="checkout-input" placeholder="مثال: أحمد محمد أو رقم التليفون" style="font-size: 0.9rem; padding: 10px 14px;">
+                </div>
+              </div>
+
+              <label class="checkout-payment-option" style="cursor: pointer;">
+                <input type="radio" name="payment" value="paymob" onchange="togglePaymentBox()"> 
+                <span>💳 الدفع بالبطاقة البنكية (Paymob)</span>
               </label>
             </div>
 
@@ -135,6 +158,11 @@
         btn.textContent = 'جاري الإرسال...';
 
         var paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+        var paymentDetails = paymentMethod;
+        if (paymentMethod === 'instapay') {
+          var sender = document.getElementById('c-instapay-sender').value.trim();
+          paymentDetails = sender ? ('instapay (' + sender + ')') : 'instapay';
+        }
 
         if (!window.mapLocation) {
           alert('الرجاء تحديد موقعك على الخريطة أولاً!');
@@ -149,7 +177,7 @@
           name: document.getElementById('c-name').value,
           phone: document.getElementById('c-phone').value,
           address: fullAddress,
-          payment: paymentMethod,
+          payment: paymentDetails,
           items: Cart.items,
           total: Cart.getTotal() + 50
         };
@@ -165,7 +193,9 @@
               '<div class="checkout-success">' +
                 '<div class="checkout-success-icon">✓</div>' +
                 '<h2 class="checkout-success-title">تم استلام طلبك بنجاح!</h2>' +
-                '<p class="checkout-success-msg">هنتواصل معاك قريب لتأكيد الطلب وموعد التوصيل.</p>' +
+                (paymentMethod === 'instapay' 
+                  ? '<p class="checkout-success-msg">تم تسجيل طلبك بالدفع عبر إنستاباي. هنتواصل معاك للتأكيد وموعد التوصيل.</p>'
+                  : '<p class="checkout-success-msg">هنتواصل معاك قريب لتأكيد الطلب وموعد التوصيل.</p>') +
                 '<a href="index.html" class="checkout-success-link">العودة للرئيسية</a>' +
               '</div>';
           }
@@ -176,6 +206,28 @@
         }
       });
     });
+
+    function togglePaymentBox() {
+      var instapayChecked = document.querySelector('input[name="payment"][value="instapay"]').checked;
+      var box = document.getElementById('instapay-box');
+      if (box) {
+        box.style.display = instapayChecked ? 'block' : 'none';
+      }
+    }
+
+    function copyInstaPay() {
+      var acc = document.getElementById('instapay-account').textContent.trim();
+      navigator.clipboard.writeText(acc).then(function() {
+        var btn = document.getElementById('copy-instapay-btn');
+        var old = btn.textContent;
+        btn.textContent = 'تم النسخ ✓';
+        btn.style.background = '#27ae60';
+        setTimeout(function() {
+          btn.textContent = old;
+          btn.style.background = '#7E7AE0';
+        }, 2000);
+      });
+    }
 
     var map, marker;
     window.mapLocation = null;

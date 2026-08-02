@@ -235,7 +235,18 @@
         if(status === 'Paid') badgeClass = 'badge-in';
         if(status === 'Failed') badgeClass = 'badge-out';
 
-        var paymentMethod = o[5] === 'paymob' ? 'دفع إلكتروني (Paymob)' : (o[5] === 'cod' ? 'نقداً عند الاستلام' : o[5]);
+        var rawPay = String(o[5] || '');
+        var paymentMethod = '💵 نقداً عند الاستلام';
+        if (rawPay.indexOf('paymob') !== -1) {
+          paymentMethod = '<span style="color:#2980b9; font-weight:bold;">💳 Paymob (بطاقة بنكية)</span>';
+        } else if (rawPay.indexOf('instapay') !== -1) {
+          var senderPart = rawPay.replace('instapay', '').replace(/[()]/g, '').trim();
+          paymentMethod = '<span style="color:#8e44ad; font-weight:bold;">⚡ إنستاباي (InstaPay)</span>' + (senderPart ? ('<br><small style="color:#555;">(المحُوِّل: ' + senderPart + ')</small>') : '');
+        } else if (rawPay === 'cod') {
+          paymentMethod = '💵 نقداً عند الاستلام';
+        } else {
+          paymentMethod = rawPay;
+        }
         var addressHTML = String(o[3]).replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color:#7E7AE0; text-decoration:underline; font-weight:bold;">📍 فتح الموقع على الخريطة</a>').replace(/\n/g, '<br>');
 
         var tr = document.createElement('tr');
