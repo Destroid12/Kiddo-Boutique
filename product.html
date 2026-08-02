@@ -39,7 +39,12 @@
         <h1 id="p-title">جاري التحميل...</h1>
       </div>
 
-      <div id="product-container" class="product-detail">
+      <div id="product-loader" class="loading-container">
+        <div class="spinner"></div>
+        <p class="loading-text">جاري تحميل تفاصيل المنتج...</p>
+      </div>
+
+      <div id="product-container" class="product-detail" style="display:none;">
         <div>
           <img id="p-image" class="product-detail-img" src="" alt="">
           <div id="p-gallery" style="display:flex; gap:10px; margin-top:16px; overflow-x:auto;"></div>
@@ -73,6 +78,7 @@
       var id = urlParams.get('id');
 
       if (!id) {
+        document.getElementById('product-loader').style.display = 'none';
         document.getElementById('p-title').textContent = 'المنتج غير موجود.';
         return;
       }
@@ -80,9 +86,13 @@
       currentProduct = await fetchProductById(id);
 
       if (!currentProduct) {
+        document.getElementById('product-loader').style.display = 'none';
         document.getElementById('p-title').textContent = 'المنتج غير موجود.';
         return;
       }
+
+      document.getElementById('product-loader').style.display = 'none';
+      document.getElementById('product-container').style.display = 'grid';
 
       document.title = currentProduct.title + ' - Kiddo Boutique';
       document.getElementById('p-image').src = currentProduct.image;
