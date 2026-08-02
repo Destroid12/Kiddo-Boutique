@@ -3,7 +3,11 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbySA-TU9jnVFQYDeku6m
 async function fetchProducts() {
   try {
     const res = await fetch(SCRIPT_URL, { cache: 'no-store' });
-    return await res.json();
+    const data = await res.json();
+    return data.map(p => {
+      p.status = p.status || p[''] || p['col_8'] || 'in_stock';
+      return p;
+    });
   } catch(e) {
     console.error("Error fetching products:", e);
     return [];

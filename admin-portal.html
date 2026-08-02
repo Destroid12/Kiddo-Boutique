@@ -203,13 +203,13 @@
       
       var res = await adminAction('get_orders', {}, pwd);
       if (!res.success) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:red;">خطأ: ' + res.error + '</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:red;padding:20px;">' + (res.error === 'Unauthorized' ? 'كلمة المرور غير صحيحة. اضغط على زر "خروج" واكتب كلمة المرور الصحيحة.' : ('خطأ: ' + res.error)) + '</td></tr>';
         return;
       }
       
-      var orders = res.orders;
+      var rawOrders = res.orders || [];
       tbody.innerHTML = '';
-      if (orders.length === 0) {
+      if (rawOrders.length === 0) {
         tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">لا توجد طلبات بعد.</td></tr>';
         return;
       }
@@ -217,38 +217,45 @@
       var totalSales = 0;
       var pendingCount = 0;
       
-      orders.forEach(function(o, index) {
+      var ordersWithRow = rawOrders.map(function(o, idx) {
+        return { rowIndex: idx + 2, item: o };
+      });
+      ordersWithRow.reverse(); // Show newest orders at the top
+
+      ordersWithRow.forEach(function(entry) {
+        var o = entry.item;
+        var rIndex = entry.rowIndex;
         // o is [timestamp, name, phone, address, total, payment_method, items, paymob_order_id, status]
         var status = o[8] || 'Pending';
         if (status === 'Confirmed' || status === 'Paid') totalSales += Number(o[4]);
         if (status === 'Pending') pendingCount++;
         
         var badgeClass = status === 'Confirmed' ? 'badge-in' : (status === 'Cancelled' ? 'badge-out' : 'badge');
-        if(status === 'Pending') badgeClass = 'badge'; // greyish
+        if(status === 'Pending') badgeClass = 'badge';
         if(status === 'Paid') badgeClass = 'badge-in';
         if(status === 'Failed') badgeClass = 'badge-out';
 
         var paymentMethod = o[5] === 'paymob' ? 'دفع إلكتروني (Paymob)' : (o[5] === 'cod' ? 'نقداً عند الاستلام' : o[5]);
-        var addressHTML = String(o[3]).replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color:#7E7AE0; text-decoration:underline;">$1</a>').replace(/\n/g, '<br>');
+        var addressHTML = String(o[3]).replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color:#7E7AE0; text-decoration:underline; font-weight:bold;">📍 فتح الموقع على الخريطة</a>').replace(/\n/g, '<br>');
 
         var tr = document.createElement('tr');
         tr.innerHTML = 
-          '<td>' + new Date(o[0]).toLocaleDateString() + '</td>' +
-          '<td>' + o[1] + '<br><small>' + addressHTML + '</small></td>' +
+          '<td>' + new Date(o[0]).toLocaleDateString('ar-EG', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) + '</td>' +
+          '<td><strong>' + o[1] + '</strong><br><small>' + addressHTML + '</small></td>' +
           '<td dir="ltr">' + o[2] + '</td>' +
           '<td>' + paymentMethod + '</td>' +
-          '<td><pre style="font-family:inherit; margin:0; font-size:0.8rem;">' + o[6] + '</pre></td>' +
-          '<td>' + o[4] + '</td>' +
+          '<td><pre style="font-family:inherit; margin:0; font-size:0.85rem; white-space:pre-wrap;">' + o[6] + '</pre></td>' +
+          '<td><strong>' + o[4] + ' ج.م</strong></td>' +
           '<td><span class="badge ' + badgeClass + '">' + status + '</span></td>' +
           '<td>' +
-            '<button onclick="updateOrder(' + (index + 2) + ', \'Confirmed\')" class="admin-btn btn-success">تأكيد</button>' +
-            '<button onclick="updateOrder(' + (index + 2) + ', \'Cancelled\')" class="admin-btn btn-warning">إلغاء</button>' +
-            '<button onclick="deleteOrder(' + (index + 2) + ')" class="admin-btn btn-danger">حذف</button>' +
+            '<button onclick="updateOrder(' + rIndex + ', \'Confirmed\')" class="admin-btn btn-success">تأكيد</button>' +
+            '<button onclick="updateOrder(' + rIndex + ', \'Cancelled\')" class="admin-btn btn-warning">إلغاء</button>' +
+            '<button onclick="deleteOrder(' + rIndex + ')" class="admin-btn btn-danger">حذف</button>' +
           '</td>';
         tbody.appendChild(tr);
       });
       
-      document.getElementById('stat-orders').textContent = orders.length;
+      document.getElementById('stat-orders').textContent = rawOrders.length;
       document.getElementById('stat-sales').textContent = totalSales + ' ج.م';
       document.getElementById('stat-pending').textContent = pendingCount;
     }
@@ -283,7 +290,12 @@
       if(!confirm('هل أنت متأكد من تغيير حالة المنتج؟')) return;
       var newStatus = currentlyOut ? 'in_stock' : 'out_of_stock';
       var res = await adminAction('toggle_stock', { id: id, status: newStatus }, pwd);
-      if (res.success) { loadTable(); } else { alert('خطأ: ' + (res.error || 'غير مصرح')); }
+      if (res.success) {
+        await loadTable();
+      } else {
+        alert('خطأ: ' + (res.error === 'Unauthorized' ? 'كلمة المرور غير صحيحة. يرجى تسجيل الخروج وكتابة كلمة المرور مجدداً.' : (res.error || 'حدث خطأ')));
+        if (res.error === 'Unauthorized') logout();
+      }
     }
 
     async function deleteProd(id) {
