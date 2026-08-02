@@ -4,7 +4,70 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>الكولكشن - Kiddo Boutique</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=1.2">
+  <style>
+    .loading-container {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      text-align: center;
+    }
+    .spinner {
+      width: 44px;
+      height: 44px;
+      border: 4px solid #eae6e1;
+      border-top-color: #7E7AE0;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 16px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .loading-text {
+      font-family: inherit;
+      font-size: 1.05rem;
+      color: #7a7a7a;
+      font-weight: 600;
+    }
+    .skeleton-card {
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .skeleton-img {
+      width: 100%;
+      aspect-ratio: 3/4;
+      border-radius: 10px;
+      background: linear-gradient(90deg, #f0ede8 25%, #f8f6f2 50%, #f0ede8 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+    }
+    .skeleton-text {
+      height: 16px;
+      margin-top: 12px;
+      border-radius: 4px;
+      background: linear-gradient(90deg, #f0ede8 25%, #f8f6f2 50%, #f0ede8 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      width: 70%;
+    }
+    .skeleton-price {
+      height: 14px;
+      margin-top: 8px;
+      border-radius: 4px;
+      background: linear-gradient(90deg, #f0ede8 25%, #f8f6f2 50%, #f0ede8 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      width: 40%;
+    }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+  </style>
 </head>
 <body>
   <nav>
@@ -47,14 +110,12 @@
         <input type="text" id="search-input" placeholder="ابحثي عن منتج..." style="padding: 12px 20px; width: 100%; max-width: 400px; border-radius: 24px; border: 1px solid #eae6e1; font-family: inherit; font-size: 0.95rem; outline: none;">
       </div>
 
-      <div class="shop-grid" id="products-container">
-        <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"></div><div class="skeleton-price"></div></div>
-        <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"></div><div class="skeleton-price"></div></div>
-        <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"></div><div class="skeleton-price"></div></div>
-        <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"></div><div class="skeleton-price"></div></div>
-        <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"></div><div class="skeleton-price"></div></div>
-        <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"></div><div class="skeleton-price"></div></div>
+      <div id="shop-loader" class="loading-container">
+        <div class="spinner"></div>
+        <p class="loading-text">جاري تحميل المنتجات...</p>
       </div>
+
+      <div class="shop-grid" id="products-container" style="display: none;"></div>
     </div>
   </section>
 
@@ -103,6 +164,10 @@
 
       var allProducts = await fetchProducts();
       var currentQuery = '';
+
+      var loaderEl = document.getElementById('shop-loader');
+      if (loaderEl) loaderEl.style.display = 'none';
+      container.style.display = 'grid';
 
       function renderProducts() {
         var filtered = allProducts;
