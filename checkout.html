@@ -173,9 +173,14 @@
 
         var fullAddress = 'https://www.google.com/maps/search/?api=1&query=' + window.mapLocation;
 
+        var phoneVal = document.getElementById('c-phone').value.trim();
+        if (phoneVal && !phoneVal.startsWith('0') && !phoneVal.startsWith('+')) {
+          phoneVal = '0' + phoneVal;
+        }
+
         var orderData = {
-          name: document.getElementById('c-name').value,
-          phone: document.getElementById('c-phone').value,
+          name: document.getElementById('c-name').value.trim(),
+          phone: phoneVal,
           address: fullAddress,
           payment: paymentDetails,
           items: Cart.items,

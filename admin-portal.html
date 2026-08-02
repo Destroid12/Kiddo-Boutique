@@ -247,13 +247,19 @@
         } else {
           paymentMethod = rawPay;
         }
-        var addressHTML = String(o[3]).replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color:#7E7AE0; text-decoration:underline; font-weight:bold;">📍 فتح الموقع على الخريطة</a>').replace(/\n/g, '<br>');
+
+        var phoneStr = String(o[2] || '').trim();
+        if (phoneStr && !phoneStr.startsWith('0') && !phoneStr.startsWith('+')) {
+          phoneStr = '0' + phoneStr;
+        }
+
+        var addressHTML = String(o[3]).replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color:#7E7AE0; text-decoration:underline; font-weight:bold;">فتح الموقع على الخريطة</a>').replace(/\n/g, '<br>');
 
         var tr = document.createElement('tr');
         tr.innerHTML = 
           '<td>' + new Date(o[0]).toLocaleDateString('ar-EG', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) + '</td>' +
           '<td><strong>' + o[1] + '</strong><br><small>' + addressHTML + '</small></td>' +
-          '<td dir="ltr">' + o[2] + '</td>' +
+          '<td dir="ltr" style="font-weight:600;">' + phoneStr + '</td>' +
           '<td>' + paymentMethod + '</td>' +
           '<td><pre style="font-family:inherit; margin:0; font-size:0.85rem; white-space:pre-wrap;">' + o[6] + '</pre></td>' +
           '<td><strong>' + o[4] + ' ج.م</strong></td>' +
