@@ -8,6 +8,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
@@ -1301,19 +1302,9 @@ footer .foot-right a:hover {
   .product-detail {
     grid-template-columns: 1fr;
   }
-  .cart-item-row {
-    flex-direction: column;
-  }
-  .cart-item-img {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 3/4;
-  }
-  .cart-item-actions {
-    align-items: flex-start;
-    flex-direction: row;
-    justify-content: space-between;
-    width: 100%;
+  .product-detail-img {
+    max-width: 320px;
+    margin: 0 auto;
   }
   .shop-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -1332,8 +1323,8 @@ footer .foot-right a:hover {
   .nav-right {
     position: fixed;
     top: 0;
-    right: -100%;
-    left: auto;
+    left: -100%;
+    right: auto;
     width: 280px;
     height: 100dvh;
     background: #faf8f5;
@@ -1342,13 +1333,13 @@ footer .foot-right a:hover {
     padding: 80px 24px 32px;
     gap: 8px;
     z-index: 100;
-    border-left: 1px solid #eae6e1;
-    border-right: none;
-    transition: right 0.35s ease;
+    border-right: 1px solid #eae6e1;
+    border-left: none;
+    transition: left 0.35s ease;
   }
 
   .nav-right.open {
-    right: 0;
+    left: 0;
   }
 
   .nav-right a {
