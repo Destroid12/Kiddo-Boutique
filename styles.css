@@ -1316,9 +1316,10 @@ footer .foot-right a:hover {
     width: 100%;
   }
   .shop-grid {
-    grid-template-columns: 1fr;
-    max-width: 400px;
-    margin: 0 auto;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin: 0;
+    max-width: 100%;
   }
 
   .hero {
@@ -1384,10 +1385,10 @@ footer .foot-right a:hover {
   }
 
   .grid {
-    grid-template-columns: 1fr;
-    max-width: 400px;
-    margin: 0 auto;
-    gap: 32px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin: 0;
+    max-width: 100%;
   }
 
   .why-cards {
