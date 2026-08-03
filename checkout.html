@@ -104,10 +104,6 @@
             <span class="checkout-sidebar-line-label">المجموع:</span>
             <span class="checkout-sidebar-line-value" id="co-total"></span>
           </div>
-          <div class="checkout-sidebar-line">
-            <span class="checkout-sidebar-line-label">الشحن:</span>
-            <span class="checkout-sidebar-line-value">50 ج.م</span>
-          </div>
           <hr class="checkout-sidebar-divider">
           <div class="checkout-sidebar-total">
             <span>الإجمالي:</span>
@@ -146,7 +142,7 @@
 
         var total = Cart.getTotal();
         document.getElementById('co-total').textContent = total + ' ج.م';
-        document.getElementById('co-final').textContent = (total + 50) + ' ج.م';
+        document.getElementById('co-final').textContent = total + ' ج.م';
       }, 50);
 
       var form = document.getElementById('checkoutForm');
@@ -184,7 +180,7 @@
           address: fullAddress,
           payment: paymentDetails,
           items: Cart.items,
-          total: Cart.getTotal() + 50
+          total: Cart.getTotal()
         };
 
         var res = await submitOrder(orderData);
