@@ -9,7 +9,6 @@ async function fetchProducts() {
       return p;
     });
   } catch(e) {
-    console.error("Error fetching products:", e);
     return [];
   }
 }
@@ -20,7 +19,6 @@ async function fetchProductById(id) {
 }
 
 async function submitOrder(orderData) {
-  console.log('Sending order to Google Sheets:', orderData);
   try {
     const res = await fetch(SCRIPT_URL, {
       method: 'POST',
@@ -28,7 +26,6 @@ async function submitOrder(orderData) {
     });
     return await res.json();
   } catch(e) {
-    console.error("Error submitting order:", e);
     return { success: false };
   }
 }
@@ -45,7 +42,6 @@ async function adminAction(action, payloadData, password) {
     });
     return await res.json();
   } catch(e) {
-    console.error("Admin action failed:", e);
     return { success: false, error: e.toString() };
   }
 }

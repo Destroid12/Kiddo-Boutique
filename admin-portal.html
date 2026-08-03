@@ -242,12 +242,12 @@
       var ordersWithRow = rawOrders.map(function(o, idx) {
         return { rowIndex: idx + 2, item: o };
       });
-      ordersWithRow.reverse(); // Show newest orders at the top
+      ordersWithRow.reverse();
 
       ordersWithRow.forEach(function(entry) {
         var o = entry.item;
         var rIndex = entry.rowIndex;
-        // o is [timestamp, name, phone, address, total, payment_method, items, paymob_order_id, status]
+
         var status = o[8] || 'Pending';
         if (status === 'Confirmed' || status === 'Paid') totalSales += Number(o[4]);
         if (status === 'Pending') pendingCount++;

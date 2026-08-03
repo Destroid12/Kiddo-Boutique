@@ -29,8 +29,6 @@ const Cart = {
       });
     }
     this.save();
-    
-    // Quick toast animation or alert could go here
     this.showToast('تمت الإضافة للسلة بنجاح!');
   },
   
@@ -85,5 +83,4 @@ const Cart = {
   }
 };
 
-// Initialize the cart when the DOM is ready
 document.addEventListener('DOMContentLoaded', () => Cart.init());
