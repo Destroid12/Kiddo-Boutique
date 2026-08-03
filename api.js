@@ -1,4 +1,4 @@
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbySA-TU9jnVFQYDeku6mWhTtEQAETXnCEs3rXq0hLy4xOptY9zHXiCgDtnc54B_zh2M/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwhxTdq9jqSsM6L_Dts1XwW71CBTApTxNjHxkLFANS3xeTMDMCEX_8yoc4XXj-jNK4/exec';
 
 async function fetchProducts() {
   try {
