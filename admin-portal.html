@@ -159,7 +159,11 @@
         pwd = val; 
         showDashboard(res.orders);
       } else {
-        alert('كلمة المرور غير صحيحة!');
+        if (res.error === 'Unauthorized') {
+          alert('كلمة المرور غير صحيحة!');
+        } else {
+          alert('حدث خطأ في الاتصال بقاعدة البيانات: ' + (res.error || 'غير معروف'));
+        }
         btn.disabled = false; btn.textContent = oldText;
       }
     }
