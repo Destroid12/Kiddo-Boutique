@@ -157,7 +157,7 @@
       if (res.success) {
         sessionStorage.setItem('admin_pwd', val); 
         pwd = val; 
-        showDashboard();
+        showDashboard(res.orders);
       } else {
         alert('كلمة المرور غير صحيحة!');
         btn.disabled = false; btn.textContent = oldText;
@@ -174,15 +174,17 @@
       el.classList.add('active');
     }
 
-    async function refreshData() {
-      await loadTable();
-      await loadOrders();
+    async function refreshData(initialOrders) {
+      await Promise.all([
+        loadTable(),
+        loadOrders(initialOrders)
+      ]);
     }
 
-    async function showDashboard() {
+    async function showDashboard(initialOrders) {
       document.getElementById('login-screen').style.display = 'none';
       document.getElementById('dashboard-screen').style.display = 'block';
-      refreshData();
+      refreshData(initialOrders);
     }
 
     async function loadTable() {
@@ -210,22 +212,24 @@
       });
     }
 
-    async function loadOrders() {
+    async function loadOrders(cachedOrders) {
       var tbody = document.getElementById('orders-table-body');
       tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">جاري التحميل...</td></tr>';
       
-      var res = await adminAction('get_orders', {}, pwd);
-      if (!res.success) {
-        if (res.error === 'Unauthorized') {
-          alert('كلمة المرور غير صحيحة. يرجى تسجيل الدخول مرة أخرى.');
-          logout();
+      var rawOrders = cachedOrders;
+      if (!rawOrders) {
+        var res = await adminAction('get_orders', {}, pwd);
+        if (!res.success) {
+          if (res.error === 'Unauthorized') {
+            alert('كلمة المرور غير صحيحة. يرجى تسجيل الدخول مرة أخرى.');
+            logout();
+            return;
+          }
+          tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:red;padding:20px;">خطأ: ' + res.error + '</td></tr>';
           return;
         }
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:red;padding:20px;">خطأ: ' + res.error + '</td></tr>';
-        return;
+        rawOrders = res.orders || [];
       }
-      
-      var rawOrders = res.orders || [];
       tbody.innerHTML = '';
       if (rawOrders.length === 0) {
         tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">لا توجد طلبات بعد.</td></tr>';
