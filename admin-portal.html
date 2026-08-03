@@ -146,9 +146,22 @@
     var pwd = sessionStorage.getItem('admin_pwd');
     if (pwd) showDashboard();
 
-    function login() {
+    async function login() {
       var val = document.getElementById('admin-pwd').value;
-      if (val.trim()) { sessionStorage.setItem('admin_pwd', val); pwd = val; showDashboard(); }
+      if (!val.trim()) return;
+      var btn = document.querySelector('.login-box button');
+      var oldText = btn.textContent;
+      btn.disabled = true; btn.textContent = 'جاري التحقق...';
+      
+      var res = await adminAction('get_orders', {}, val);
+      if (res.success) {
+        sessionStorage.setItem('admin_pwd', val); 
+        pwd = val; 
+        showDashboard();
+      } else {
+        alert('كلمة المرور غير صحيحة!');
+        btn.disabled = false; btn.textContent = oldText;
+      }
     }
 
     function logout() { sessionStorage.removeItem('admin_pwd'); window.location.reload(); }
@@ -203,7 +216,12 @@
       
       var res = await adminAction('get_orders', {}, pwd);
       if (!res.success) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:red;padding:20px;">' + (res.error === 'Unauthorized' ? 'كلمة المرور غير صحيحة. اضغط على زر "خروج" واكتب كلمة المرور الصحيحة.' : ('خطأ: ' + res.error)) + '</td></tr>';
+        if (res.error === 'Unauthorized') {
+          alert('كلمة المرور غير صحيحة. يرجى تسجيل الدخول مرة أخرى.');
+          logout();
+          return;
+        }
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:red;padding:20px;">خطأ: ' + res.error + '</td></tr>';
         return;
       }
       
