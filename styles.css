@@ -1466,8 +1466,10 @@ footer .foot-right a:hover {
     justify-content: flex-start;
     gap: 16px;
     width: 100%;
-    padding: 14px 8px;
-    border-bottom: 1px solid #eae6e1;
+    padding: 16px 8px 0;
+    border-bottom: none;
+    border-top: 1px solid #eae6e1;
+    margin-top: 8px;
   }
 
   .nav-right .nav-social-link {
