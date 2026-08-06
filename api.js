@@ -103,14 +103,8 @@ async function submitOrder(orderData) {
   }
 
   try {
-    let currentUser = null;
-    if (typeof KiddoAuth !== 'undefined') {
-      currentUser = await KiddoAuth.getCurrentUser();
-    }
-
     const newOrder = {
       id: 'ord_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
-      user_id: currentUser ? currentUser.id : null,
       customer_name: orderData.name,
       phone: orderData.phone,
       address: orderData.address,
