@@ -26,14 +26,14 @@ function bustProductCache() {
 async function fetchProducts(forceRefresh = false) {
   if (!forceRefresh) {
     const cached = getCachedProducts();
-    if (cached && cached.length > 0) return cached;
+    if (cached !== null) return cached;
   }
   
   const sb = typeof getSupabase === 'function' ? getSupabase() : null;
   if (sb) {
     try {
       const { data, error } = await sb.from('products').select('*').order('created_at', { ascending: true });
-      if (!error && data && data.length > 0) {
+      if (!error && data) {
         const formatted = data.map(p => {
           return {
             id: String(p.id),
@@ -54,41 +54,7 @@ async function fetchProducts(forceRefresh = false) {
   }
 
   const cached = getCachedProducts();
-  return cached || [
-    {
-      id: 'p1',
-      title: 'طقم صيفي كاجوال ولادي',
-      category: 'boys',
-      price: '280',
-      sizes: ['2Y', '4Y', '6Y', '8Y'],
-      image: 'https://th.bing.com/th/id/OIP.jhj4Vnl4n5Vz7PvELBXQkAHaJ1?w=141&h=188&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3',
-      images: ['https://th.bing.com/th/id/OIP.jhj4Vnl4n5Vz7PvELBXQkAHaJ1?w=141&h=188&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3'],
-      description: 'طقم قطن 100% عالي الجودة مريح جداً للأطفال في الصيف ومناسب للخروج واللعب.',
-      status: 'in_stock'
-    },
-    {
-      id: 'p2',
-      title: 'فستان صيفي بناتي رقيق',
-      category: 'girls',
-      price: '320',
-      sizes: ['1Y', '2Y', '3Y', '5Y'],
-      image: 'https://tse2.mm.bing.net/th/id/OIP.3HK0pkdR8MzoNezXxKEqOwHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3',
-      images: ['https://tse2.mm.bing.net/th/id/OIP.3HK0pkdR8MzoNezXxKEqOwHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3'],
-      description: 'فستان قطن بناتي بتصميم مميز وألوان مبهجة تناسب الخروجات والمناسبات الصيفية.',
-      status: 'in_stock'
-    },
-    {
-      id: 'p3',
-      title: 'سالوبيت مواليد قطن ناعم',
-      category: 'babies',
-      price: '190',
-      sizes: ['0-3M', '3-6M', '6-9M', '9-12M'],
-      image: 'https://tse2.mm.bing.net/th/id/OIP.0TDWJIRS-TgHG8seIBQHXQHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3',
-      images: ['https://tse2.mm.bing.net/th/id/OIP.0TDWJIRS-TgHG8seIBQHXQHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3'],
-      description: 'سالوبيت رضع من أنعم أنواع القطن المصري للمحافظة على بشرة طفلك الحساسة طوال اليوم.',
-      status: 'in_stock'
-    }
-  ];
+  return cached || [];
 }
 
 async function fetchProductById(id) {

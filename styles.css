@@ -934,6 +934,13 @@ nav .wrap {
   background: #444;
 }
 
+.cart-sidebar-btn.disabled {
+  opacity: 0.45;
+  pointer-events: none;
+  cursor: not-allowed;
+  background: #999;
+}
+
 .cart-empty {
   text-align: center;
   padding: 60px 20px;

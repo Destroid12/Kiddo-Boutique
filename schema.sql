@@ -47,11 +47,3 @@ CREATE POLICY "Anyone can insert orders" ON public.orders FOR INSERT WITH CHECK 
 
 DROP POLICY IF EXISTS "Allow order management" ON public.orders;
 CREATE POLICY "Allow order management" ON public.orders FOR ALL USING (true);
-
--- 3. Initial Products Seed Data
-INSERT INTO public.products (id, title, category, price, sizes, image, images, description, status)
-VALUES
-  ('p1', 'طقم صيفي كاجوال ولادي', 'boys', '280', ARRAY['2Y', '4Y', '6Y', '8Y'], 'https://th.bing.com/th/id/OIP.jhj4Vnl4n5Vz7PvELBXQkAHaJ1?w=141&h=188&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3', ARRAY['https://th.bing.com/th/id/OIP.jhj4Vnl4n5Vz7PvELBXQkAHaJ1?w=141&h=188&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3'], 'طقم قطن 100% عالي الجودة مريح جداً للأطفال في الصيف ومناسب للخروج واللعب.', 'in_stock'),
-  ('p2', 'فستان صيفي بناتي رقيق', 'girls', '320', ARRAY['1Y', '2Y', '3Y', '5Y'], 'https://tse2.mm.bing.net/th/id/OIP.3HK0pkdR8MzoNezXxKEqOwHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3', ARRAY['https://tse2.mm.bing.net/th/id/OIP.3HK0pkdR8MzoNezXxKEqOwHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3'], 'فستان قطن بناتي بتصميم مميز وألوان مبهجة تناسب الخروجات والمناسبات الصيفية.', 'in_stock'),
-  ('p3', 'سالوبيت مواليد قطن ناعم', 'babies', '190', ARRAY['0-3M', '3-6M', '6-9M', '9-12M'], 'https://tse2.mm.bing.net/th/id/OIP.0TDWJIRS-TgHG8seIBQHXQHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3', ARRAY['https://tse2.mm.bing.net/th/id/OIP.0TDWJIRS-TgHG8seIBQHXQHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3'], 'سالوبيت رضع من أنعم أنواع القطن المصري للمحافظة على بشرة طفلك الحساسة طوال اليوم.', 'in_stock')
-ON CONFLICT (id) DO NOTHING;
