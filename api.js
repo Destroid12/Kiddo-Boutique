@@ -81,8 +81,9 @@ async function submitOrder(orderData) {
       created_at: new Date().toISOString()
     };
 
-    const { data, error } = await sb.from('orders').insert([newOrder]).select().single();
+    const { data, error } = await sb.from('orders').insert([newOrder]);
     if (error) {
+      console.error('Order insert error:', error);
       return { success: false, error: error.message };
     }
 

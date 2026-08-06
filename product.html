@@ -94,7 +94,10 @@
           <hr class="product-detail-divider">
           <label class="product-size-label" for="size">تفاصيل:</label>
           <select id="size" class="product-size-select"></select>
-          <button id="add-to-cart" class="product-add-btn">أضف للسلة</button>
+          <div style="display:flex; gap:12px; margin-top:20px; flex-wrap:wrap;">
+            <button id="add-to-cart" class="product-add-btn" style="flex:1; min-width:140px;">أضف للسلة</button>
+            <button id="buy-now-btn" class="product-add-btn" style="flex:1; min-width:140px; background:#2c2c2c;">اشتري الآن</button>
+          </div>
         </div>
       </div>
     </div>
@@ -210,6 +213,21 @@
         
         Cart.add(productToCart, chosenSize);
       });
+
+      var buyNowBtn = document.getElementById('buy-now-btn');
+      if (buyNowBtn) {
+        buyNowBtn.addEventListener('click', function() {
+          var selectedOpt = sizeSelect.options[sizeSelect.selectedIndex];
+          var specificPrice = selectedOpt ? Number(selectedOpt.dataset.price) : Number(window.productPrices[0] || currentProduct.price);
+          var chosenSize = selectedOpt ? selectedOpt.value : (sizes[0] || 'عادي');
+          
+          var productToCart = Object.assign({}, currentProduct);
+          productToCart.price = specificPrice;
+          
+          Cart.add(productToCart, chosenSize);
+          window.location.href = 'checkout.html';
+        });
+      }
     });
 
     var burger = document.querySelector('.burger');
