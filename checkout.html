@@ -171,11 +171,15 @@
         btn.disabled = true;
         btn.textContent = 'جاري الإرسال...';
 
-        var paymentMethod = document.querySelector('input[name="payment"]:checked').value;
-        var paymentDetails = paymentMethod;
-        if (paymentMethod === 'instapay') {
+        var paymentInput = document.querySelector('input[name="payment"]:checked');
+        var paymentVal = paymentInput ? paymentInput.value : 'cod';
+        var paymentDetails = 'الدفع عند الاستلام';
+
+        if (paymentVal === 'instapay') {
           var sender = document.getElementById('c-instapay-sender').value.trim();
-          paymentDetails = sender ? ('instapay (' + sender + ')') : 'instapay';
+          paymentDetails = sender ? ('إنستاباي (المحوّل: ' + sender + ')') : 'إنستاباي (InstaPay)';
+        } else if (paymentVal === 'paymob') {
+          paymentDetails = 'بطاقة بنكية (Paymob)';
         }
 
         if (!window.mapLocation) {
@@ -197,6 +201,7 @@
           phone: phoneVal,
           address: fullAddress,
           payment: paymentDetails,
+          payment_method: paymentDetails,
           items: Cart.items,
           total: Cart.getTotal()
         };
@@ -212,9 +217,9 @@
               '<div class="checkout-success">' +
                 '<div class="checkout-success-icon">✓</div>' +
                 '<h2 class="checkout-success-title">تم استلام طلبك بنجاح!</h2>' +
-                (paymentMethod === 'instapay' 
-                  ? '<p class="checkout-success-msg">تم تسجيل طلبك بالدفع عبر إنستاباي. هنتواصل معاك للتأكيد وموعد التوصيل.</p>'
-                  : '<p class="checkout-success-msg">هنتواصل معاك قريب لتأكيد الطلب وموعد التوصيل.</p>') +
+                (paymentVal === 'instapay' 
+                  ? '<p class="checkout-success-msg">تم تسجيل طلبك بالدفع عبر إنستاباي. سنتواصل معك لتأكيد التحويل وموعد التوصيل.</p>'
+                  : '<p class="checkout-success-msg">سنتواصل معك قريباً لتأكيد الطلب وموعد التوصيل.</p>') +
                 '<a href="index.html" class="checkout-success-link">العودة للرئيسية</a>' +
               '</div>';
           }

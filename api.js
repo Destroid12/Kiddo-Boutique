@@ -87,7 +87,7 @@ async function submitOrder(orderData) {
       return { success: false, error: error.message };
     }
 
-    // 1. Direct email notification via Google Apps Script (100% reliable, direct to your Gmail)
+    
     const GOOGLE_NOTIFY_URL = 'https://script.google.com/macros/s/AKfycbwhxTdq9jqSsM6L_Dts1XwW71CBTApTxNjHxkLFANS3xeTMDMCEX_8yoc4XXj-jNK4/exec';
     try {
       fetch(GOOGLE_NOTIFY_URL, {
@@ -98,7 +98,7 @@ async function submitOrder(orderData) {
       }).catch(function(e) { console.warn('Google notify error:', e); });
     } catch(gErr) {}
 
-    // 2. Serverless notification API (Resend / Telegram)
+    
     try {
       fetch('/api/notify-order', {
         method: 'POST',

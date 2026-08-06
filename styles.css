@@ -465,7 +465,7 @@ nav .wrap {
   height: 18px;
 }
 
-/* --- E-commerce Shared --- */
+
 
 .cart-count {
   background: #7E7AE0;
@@ -509,7 +509,7 @@ nav .wrap {
   color: #ccc;
 }
 
-/* --- Shop Page --- */
+
 
 .shop-page {
   padding-bottom: 60px;
@@ -587,7 +587,7 @@ nav .wrap {
   font-family: 'Noto Kufi Arabic', sans-serif;
 }
 
-/* --- Loading Spinner & Skeletons --- */
+
 .loading-container {
   grid-column: 1 / -1;
   display: flex;
@@ -658,7 +658,7 @@ nav .wrap {
   100% { background-position: -200% 0; }
 }
 
-/* --- Product Detail Page --- */
+
 
 .product-page {
   padding: 0 0 60px;
@@ -777,7 +777,7 @@ nav .wrap {
   margin-bottom: 20px;
 }
 
-/* --- Cart Page --- */
+
 
 .cart-page {
   padding: 0 0 60px;
@@ -968,7 +968,7 @@ nav .wrap {
   background: #444;
 }
 
-/* --- Checkout Page --- */
+
 
 .checkout-page {
   padding: 0 0 60px;
@@ -1195,7 +1195,7 @@ nav .wrap {
   background: #6C68CC;
 }
 
-/* Toast */
+
 #cart-toast {
   position: fixed;
   bottom: -50px;
@@ -1436,7 +1436,7 @@ footer .foot-right a:hover {
   .page-header h1 {
 }
 
-/* Social Media & Auth UI */
+
 .nav-socials {
   display: flex;
   align-items: center;
@@ -1487,7 +1487,7 @@ footer .foot-right a:hover {
   font-size: 1rem;
 }
 
-/* Auth Modal */
+
 .kiddo-modal-overlay {
   position: fixed;
   inset: 0;

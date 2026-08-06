@@ -74,7 +74,7 @@
       justify-content: center;
     }
 
-    /* Sheet / Table for variants & pricing */
+    
     .sheet-card {
       background: #ffffff;
       border: 1px solid #eae6e1;
@@ -123,7 +123,7 @@
       color: #ffffff;
     }
 
-    /* Edit Modal */
+    
     .admin-modal {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -190,7 +190,7 @@
       <div class="admin-tab" onclick="switchTab('orders-view', this)">الطلبات والمبيعات</div>
     </div>
 
-    <!-- Products View -->
+    
     <div id="products-view" class="view-section active">
       <div style="margin-bottom: 20px;">
         <button onclick="toggleAddForm()" class="admin-btn btn-success">+ إضافة منتج جديد</button>
@@ -213,7 +213,7 @@
               </select>
             </div>
 
-            <!-- Dynamic Variants Sheet / Table -->
+            
             <div class="form-group" style="grid-column: 1 / -1;">
               <div class="sheet-card">
                 <div class="sheet-header">
@@ -233,14 +233,14 @@
                       </tr>
                     </thead>
                     <tbody id="add-variants-tbody">
-                      <!-- Rows dynamically rendered -->
+                      
                     </tbody>
                   </table>
                 </div>
               </div>
             </div>
 
-            <!-- Main Image Upload -->
+            
             <div class="form-group" style="grid-column: 1 / -1;">
               <label>الصورة الرئيسية للمنتج</label>
               <div class="upload-zone" onclick="document.getElementById('n-main-file').click()">
@@ -259,7 +259,7 @@
               <input type="text" id="n-image-url" placeholder="أو اكتب رابط الصورة (URL) مباشرة" style="margin-top: 8px;" oninput="handleMainUrlInput(this.value)">
             </div>
 
-            <!-- Sub Images Upload -->
+            
             <div class="form-group" style="grid-column: 1 / -1;">
               <label>الصور الإضافية للمنتج (معرض الصور)</label>
               <div class="upload-zone" onclick="document.getElementById('n-sub-files').click()">
@@ -296,7 +296,7 @@
       </div>
     </div>
 
-    <!-- Orders View -->
+    
     <div id="orders-view" class="view-section">
       <div class="stat-cards">
         <div class="stat-card">
@@ -339,7 +339,7 @@
     </div>
   </div>
 
-  <!-- Edit Product Modal -->
+  
   <div id="edit-modal" class="admin-modal">
     <div class="modal-box">
       <div class="modal-head">
@@ -362,7 +362,7 @@
             </select>
           </div>
 
-          <!-- Edit Variants Sheet -->
+          
           <div class="form-group" style="grid-column: 1 / -1;">
             <div class="sheet-card">
               <div class="sheet-header">
@@ -382,7 +382,7 @@
                     </tr>
                   </thead>
                   <tbody id="edit-variants-tbody">
-                    <!-- Rows dynamically rendered -->
+                    
                   </tbody>
                 </table>
               </div>
@@ -426,7 +426,7 @@
       resetVariantTable('add-variants-tbody');
     });
 
-    // Variants Sheet Table Functions
+    
     function addVariantRow(tbodyId, detailVal, priceVal) {
       var tbody = document.getElementById(tbodyId || 'add-variants-tbody');
       if (!tbody) return;
@@ -491,7 +491,7 @@
       return { sizes: sizes, prices: prices };
     }
 
-    // Client-side image compression
+    
     function compressImage(file, maxWidth = 1000, quality = 0.75) {
       return new Promise(function(resolve, reject) {
         var reader = new FileReader();
@@ -659,7 +659,7 @@
         var tr = document.createElement('tr');
         var isOut = p.status === 'out_of_stock';
 
-        // Format details & prices
+        
         var sizesList = Array.isArray(p.sizes) ? p.sizes : String(p.sizes || '').split(',').map(s => s.trim());
         var pricesList = String(p.price || '').split(',').map(s => s.trim());
         var variantsText = sizesList.map(function(s, idx) {

@@ -4,7 +4,7 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // Resend transactional email notification handler
+  
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
@@ -43,7 +43,7 @@ export default async function handler(req, res) {
 
   const results = { email: null, telegram: null };
 
-  // 1. Resend Transactional Email (Clean HTML, Zero Sponsors)
+  
   const resendApiKey = process.env.RESEND_API_KEY;
   if (resendApiKey) {
     try {
@@ -106,7 +106,7 @@ export default async function handler(req, res) {
     }
   }
 
-  // 2. Telegram Instant Notifications (Free, No Sponsors)
+  
   const tgToken = process.env.TELEGRAM_BOT_TOKEN;
   const tgChatId = process.env.TELEGRAM_CHAT_ID;
   if (tgToken && tgChatId) {

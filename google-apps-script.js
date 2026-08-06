@@ -1,10 +1,4 @@
-/**
- * Google Apps Script for Kiddo Boutique
- * Place this code in: Extensions (التوسيعات) > Apps Script > Code.gs
- */
-
-// --- الإعدادات ---
-var NOTIFICATION_EMAIL = "kiddo.boutique0@gmail.com"; // البريد الذي يستقبل إشعارات الطلبات الجديدة
+var NOTIFICATION_EMAIL = "kiddo.boutique0@gmail.com";
 
 function doPost(e) {
   try {
@@ -13,12 +7,20 @@ function doPost(e) {
     var customerName = data.name || data.customer_name || 'عميل';
     var phone = data.phone || '';
     var address = data.address || '';
-    var payment = data.payment || data.payment_method || 'نقداً عند الاستلام';
+    var rawPayment = data.payment || data.payment_method || 'الدفع عند الاستلام';
+    var payment = rawPayment;
+    if (rawPayment === 'cod') {
+      payment = 'الدفع عند الاستلام';
+    } else if (rawPayment === 'instapay') {
+      payment = 'إنستاباي (InstaPay)';
+    } else if (rawPayment === 'paymob') {
+      payment = 'بطاقة بنكية (Paymob)';
+    }
+
     var total = data.total || 0;
     var items = data.items || [];
     var dateStr = Utilities.formatDate(new Date(), "GMT+3", "yyyy-MM-dd HH:mm:ss");
 
-    // 1. Format Items string for Sheet & Email
     var itemsSummary = '';
     var itemsHtmlTable = '';
     if (Array.isArray(items)) {
@@ -39,11 +41,9 @@ function doPost(e) {
       itemsHtmlTable = '<tr><td colspan="4" style="padding:10px;">' + itemsSummary + '</td></tr>';
     }
 
-    // 2. Append to Active Google Sheet
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var sheet = ss.getSheetByName('Orders') || ss.getActiveSheet();
     
-    // Create header row if empty
     if (sheet.getLastRow() === 0) {
       sheet.appendRow(['التاريخ', 'اسم العميل', 'رقم الهاتف', 'العنوان / الموقع', 'طريقة الدفع', 'المنتجات', 'الإجمالي', 'الحالة']);
       sheet.getRange(1, 1, 1, 8).setFontWeight('bold').setBackground('#f0eeeb');
@@ -60,7 +60,6 @@ function doPost(e) {
       'Pending'
     ]);
 
-    // 3. Send Instant Email Alert via Gmail
     var emailSubject = '🛍️ طلب جديد من ' + customerName + ' بمبلغ ' + total + ' ج.م';
     var emailHtml = 
       '<div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px; background-color: #ffffff;">' +
