@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>السلة - Kiddo Boutique</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=2026">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-client.js"></script>
 </head>
@@ -18,9 +18,6 @@
         <div class="nav-socials">
           <a href="https://www.facebook.com/share/19TZ1tcnnn/" target="_blank" rel="noopener" class="nav-social-link" title="فيسبوك">
             <svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-          </a>
-          <a href="https://www.instagram.com/" target="_blank" rel="noopener" class="nav-social-link" title="إنستجرام">
-            <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
           </a>
           <a href="https://www.instagram.com/" target="_blank" rel="noopener" class="nav-social-link" title="إنستجرام">
             <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
@@ -62,6 +59,9 @@
             <span>الإجمالي:</span>
             <span class="cart-sidebar-total-value" id="cart-final-price">0 ج.م</span>
           </div>
+          <div id="cart-stock-warning" style="display:none; color:#e74c3c; font-size:0.85rem; font-weight:600; margin-bottom:12px; text-align:center;">
+            يوجد منتجات غير متوفرة في السلة، يرجى حذفها لإتمام الطلب.
+          </div>
           <a href="checkout.html" id="checkout-btn" class="cart-sidebar-btn">متابعة الشراء</a>
         </div>
       </div>
@@ -74,25 +74,22 @@
     </div>
   </footer>
 
+  <script src="api.js"></script>
   <script src="cart.js"></script>
   <script>
-    function renderCart() {
+    async function renderCart() {
       Cart.init();
       var itemsContainer = document.getElementById('cart-items');
       var summary = document.getElementById('cart-summary');
       var checkoutBtn = document.getElementById('checkout-btn');
       var totalEl = document.getElementById('cart-total-price');
       var finalEl = document.getElementById('cart-final-price');
+      var warningEl = document.getElementById('cart-stock-warning');
 
       itemsContainer.innerHTML = '';
 
       if (!Cart.items || Cart.items.length === 0) {
         if (summary) summary.style.display = 'none';
-        if (checkoutBtn) {
-          checkoutBtn.classList.add('disabled');
-          checkoutBtn.setAttribute('aria-disabled', 'true');
-          checkoutBtn.onclick = function(e) { e.preventDefault(); return false; };
-        }
         itemsContainer.innerHTML =
           '<div class="cart-empty">' +
             '<p class="cart-empty-msg">سلتك فاضية خالص، لم تقم بإضافة أي منتجات بعد.</p>' +
@@ -102,13 +99,15 @@
       }
 
       if (summary) summary.style.display = 'block';
-      if (checkoutBtn) {
-        checkoutBtn.classList.remove('disabled');
-        checkoutBtn.removeAttribute('aria-disabled');
-        checkoutBtn.onclick = null;
-      }
+
+      var products = await fetchProducts();
+      var hasOutOfStock = false;
 
       Cart.items.forEach(function(item) {
+        var dbProd = products.find(function(p) { return String(p.id) === String(item.id); });
+        var isOut = dbProd && dbProd.status === 'out_of_stock';
+        if (isOut) hasOutOfStock = true;
+
         var row = document.createElement('div');
         row.className = 'cart-item-row';
         row.innerHTML =
@@ -117,6 +116,7 @@
             '<a href="product.html?id=' + item.id + '" class="cart-item-title">' + item.title + '</a>' +
             '<p class="cart-item-meta">تفاصيل: ' + (item.size || 'عادي') + '</p>' +
             '<p class="cart-item-price">' + item.price + ' ج.م</p>' +
+            (isOut ? '<span style="color:#e74c3c; font-weight:bold; font-size:0.85rem; display:block; margin-top:4px;">نفذت الكمية (يرجى الحذف)</span>' : '') +
           '</div>' +
           '<div class="cart-item-actions">' +
             '<input type="number" min="1" value="' + item.quantity + '" data-id="' + item.id + '" data-size="' + item.size + '" class="cart-qty-input">' +
@@ -128,6 +128,28 @@
       var total = Cart.getTotal();
       totalEl.textContent = total + ' ج.م';
       finalEl.textContent = total + ' ج.م';
+
+      if (hasOutOfStock) {
+        if (warningEl) warningEl.style.display = 'block';
+        if (checkoutBtn) {
+          checkoutBtn.classList.add('disabled');
+          checkoutBtn.style.opacity = '0.5';
+          checkoutBtn.style.cursor = 'not-allowed';
+          checkoutBtn.onclick = function(e) {
+            e.preventDefault();
+            alert('يرجى حذف المنتجات التي نفذت كميتها من السلة قبل المتابعة.');
+            return false;
+          };
+        }
+      } else {
+        if (warningEl) warningEl.style.display = 'none';
+        if (checkoutBtn) {
+          checkoutBtn.classList.remove('disabled');
+          checkoutBtn.style.opacity = '1';
+          checkoutBtn.style.cursor = 'pointer';
+          checkoutBtn.onclick = null;
+        }
+      }
 
       document.querySelectorAll('.cart-qty-input').forEach(function(input) {
         input.addEventListener('change', function(e) {

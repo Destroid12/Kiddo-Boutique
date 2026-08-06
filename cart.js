@@ -15,6 +15,10 @@ const Cart = {
   },
   
   add: function(product, size) {
+    if (product && product.status === 'out_of_stock') {
+      this.showToast('عذراً، هذا المنتج نفذت كميته وغير متوفر حالياً.');
+      return;
+    }
     const existing = this.items.find(i => i.id === product.id && i.size === size);
     if (existing) {
       existing.quantity += 1;

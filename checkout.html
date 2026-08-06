@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>إتمام الطلب - Kiddo Boutique</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=2026">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -139,29 +139,51 @@
     var map, marker;
     window.mapLocation = null;
 
-    document.addEventListener('DOMContentLoaded', function() {
-      setTimeout(function() {
-        if (Cart.items.length === 0) {
-          window.location.href = 'shop.html';
-          return;
+    document.addEventListener('DOMContentLoaded', async function() {
+      Cart.init();
+      if (!Cart.items || Cart.items.length === 0) {
+        window.location.href = 'shop.html';
+        return;
+      }
+
+      var products = await fetchProducts();
+      var hasOutOfStock = false;
+      var outItemNames = [];
+
+      var itemsContainer = document.getElementById('checkout-items');
+      itemsContainer.innerHTML = '';
+      Cart.items.forEach(function(item) {
+        var dbProd = products.find(function(p) { return String(p.id) === String(item.id); });
+        var isOut = dbProd && dbProd.status === 'out_of_stock';
+        if (isOut) {
+          hasOutOfStock = true;
+          outItemNames.push(item.title);
         }
 
-        var itemsContainer = document.getElementById('checkout-items');
-        Cart.items.forEach(function(item) {
-          var row = document.createElement('div');
-          row.className = 'checkout-sidebar-item';
-          row.innerHTML =
-            '<span class="checkout-sidebar-item-name">' + item.quantity + 'x ' + item.title + ' (تفاصيل: ' + item.size + ')</span>' +
-            '<span class="checkout-sidebar-item-price">' + (item.price * item.quantity) + ' ج.م</span>';
-          itemsContainer.appendChild(row);
-        });
+        var row = document.createElement('div');
+        row.className = 'checkout-sidebar-item';
+        row.innerHTML =
+          '<span class="checkout-sidebar-item-name">' + item.quantity + 'x ' + item.title + ' (تفاصيل: ' + item.size + ')' +
+          (isOut ? ' <strong style="color:#e74c3c; display:block;">(نفذت الكمية)</strong>' : '') + '</span>' +
+          '<span class="checkout-sidebar-item-price">' + (item.price * item.quantity) + ' ج.م</span>';
+        itemsContainer.appendChild(row);
+      });
 
-        var total = Cart.getTotal();
-        document.getElementById('co-total').textContent = total + ' ج.م';
-        document.getElementById('co-final').textContent = total + ' ج.م';
-      }, 50);
+      var total = Cart.getTotal();
+      document.getElementById('co-total').textContent = total + ' ج.م';
+      document.getElementById('co-final').textContent = total + ' ج.م';
+
+      if (hasOutOfStock) {
+        var submitBtn = document.getElementById('submit-btn');
+        submitBtn.disabled = true;
+        submitBtn.style.opacity = '0.5';
+        submitBtn.style.cursor = 'not-allowed';
+        submitBtn.textContent = 'يوجد منتجات غير متوفرة بالسلة';
+        alert('عذراً، المنتج (' + outItemNames.join(', ') + ') نفذت كميته. يرجى الرجوع للسلة وحذفه لمتابعة الشراء.');
+      }
 
       initCheckoutMap();
+    });
 
       var form = document.getElementById('checkoutForm');
       form.addEventListener('submit', async function(e) {

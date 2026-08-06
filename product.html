@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>المنتج - Kiddo Boutique</title>
-  <link rel="stylesheet" href="styles.css?v=1.2">
+  <link rel="stylesheet" href="styles.css?v=2026.2">
   <style>
     .loading-container {
       grid-column: 1 / -1;
@@ -149,6 +149,8 @@
 
       var stockEl = document.getElementById('p-stock');
       var addBtn = document.getElementById('add-to-cart');
+      var buyNowBtn = document.getElementById('buy-now-btn');
+
       if (currentProduct.status === 'out_of_stock') {
         stockEl.textContent = 'نفذت الكمية';
         stockEl.style.color = '#e74c3c';
@@ -158,9 +160,13 @@
         stockEl.style.display = 'inline-block';
         
         addBtn.disabled = true;
-        addBtn.textContent = 'غير متوفر حالياً';
+        addBtn.textContent = 'نفذت الكمية - غير متوفر';
         addBtn.style.opacity = '0.5';
         addBtn.style.cursor = 'not-allowed';
+
+        if (buyNowBtn) {
+          buyNowBtn.style.display = 'none';
+        }
       }
 
       var gallery = document.getElementById('p-gallery');
@@ -207,6 +213,10 @@
       });
 
       document.getElementById('add-to-cart').addEventListener('click', function() {
+        if (currentProduct.status === 'out_of_stock') {
+          alert('عذراً، هذا المنتج نفذت كميته وغير متوفر حالياً.');
+          return;
+        }
         var selectedOpt = sizeSelect.options[sizeSelect.selectedIndex];
         var specificPrice = selectedOpt ? Number(selectedOpt.dataset.price) : Number(window.productPrices[0] || currentProduct.price);
         var chosenSize = selectedOpt ? selectedOpt.value : (sizes[0] || 'عادي');
@@ -217,9 +227,12 @@
         Cart.add(productToCart, chosenSize);
       });
 
-      var buyNowBtn = document.getElementById('buy-now-btn');
       if (buyNowBtn) {
         buyNowBtn.addEventListener('click', function() {
+          if (currentProduct.status === 'out_of_stock') {
+            alert('عذراً، هذا المنتج نفذت كميته وغير متوفر حالياً.');
+            return;
+          }
           var selectedOpt = sizeSelect.options[sizeSelect.selectedIndex];
           var specificPrice = selectedOpt ? Number(selectedOpt.dataset.price) : Number(window.productPrices[0] || currentProduct.price);
           var chosenSize = selectedOpt ? selectedOpt.value : (sizes[0] || 'عادي');

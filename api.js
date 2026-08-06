@@ -69,6 +69,29 @@ async function submitOrder(orderData) {
   }
 
   try {
+    const items = Array.isArray(orderData.items) ? orderData.items : [];
+    if (items.length === 0) {
+      return { success: false, error: 'السلة فارغة' };
+    }
+
+    const itemIds = items.map(function(it) { return it.id; }).filter(Boolean);
+    if (itemIds.length > 0) {
+      const { data: dbProducts, error: checkErr } = await sb
+        .from('products')
+        .select('id, title, status')
+        .in('id', itemIds);
+
+      if (!checkErr && dbProducts) {
+        const outOfStockItem = dbProducts.find(function(p) { return p.status === 'out_of_stock'; });
+        if (outOfStockItem) {
+          return {
+            success: false,
+            error: 'عذراً، المنتج "' + outOfStockItem.title + '" نفذت كميته وغير متوفر حالياً ولا يمكن إتمام الطلب.'
+          };
+        }
+      }
+    }
+
     const newOrder = {
       id: 'ord_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
       customer_name: orderData.name,
