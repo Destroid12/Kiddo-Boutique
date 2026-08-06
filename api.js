@@ -88,7 +88,7 @@ async function submitOrder(orderData) {
     }
 
     // 1. Direct email notification via Google Apps Script (100% reliable, direct to your Gmail)
-    const GOOGLE_NOTIFY_URL = 'https://script.google.com/macros/s/AKfycbySA-TU9jnVFQYDeku6mWhTtEQAETXnCEs3rXq0hLy4xOptY9zHXiCgDtnc54B_zh2M/exec';
+    const GOOGLE_NOTIFY_URL = 'https://script.google.com/macros/s/AKfycbwhxTdq9jqSsM6L_Dts1XwW71CBTApTxNjHxkLFANS3xeTMDMCEX_8yoc4XXj-jNK4/exec';
     try {
       fetch(GOOGLE_NOTIFY_URL, {
         method: 'POST',

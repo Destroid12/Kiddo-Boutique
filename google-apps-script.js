@@ -3,6 +3,9 @@
  * Place this code in: Extensions (التوسيعات) > Apps Script > Code.gs
  */
 
+// --- الإعدادات ---
+var NOTIFICATION_EMAIL = "kiddo.boutique0@gmail.com"; // البريد الذي يستقبل إشعارات الطلبات الجديدة
+
 function doPost(e) {
   try {
     var data = JSON.parse(e.postData.contents);
@@ -58,8 +61,6 @@ function doPost(e) {
     ]);
 
     // 3. Send Instant Email Alert via Gmail
-    var ownerEmail = Session.getActiveUser().getEmail() || Session.getEffectiveUser().getEmail();
-    
     var emailSubject = '🛍️ طلب جديد من ' + customerName + ' بمبلغ ' + total + ' ج.م';
     var emailHtml = 
       '<div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px; background-color: #ffffff;">' +
@@ -100,9 +101,9 @@ function doPost(e) {
         '<p style="color: #888; font-size: 12px; text-align: center; margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px;">تم إرسال هذا الإشعار تلقائياً من متجرك الإلكتروني.</p>' +
       '</div>';
 
-    if (ownerEmail) {
+    if (NOTIFICATION_EMAIL) {
       MailApp.sendEmail({
-        to: ownerEmail,
+        to: NOTIFICATION_EMAIL,
         subject: emailSubject,
         htmlBody: emailHtml
       });
