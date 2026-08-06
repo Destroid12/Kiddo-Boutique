@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>لوحة التحكم - Kiddo Boutique</title>
   <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-client.js"></script>
   <style>
     .admin-container { max-width: 1200px; margin: 40px auto; padding: 20px; background: #fff; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
     .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eae6e1; padding-bottom: 20px; }
@@ -238,18 +240,22 @@
 
       var totalSales = 0;
       var pendingCount = 0;
-      
-      var ordersWithRow = rawOrders.map(function(o, idx) {
-        return { rowIndex: idx + 2, item: o };
-      });
-      ordersWithRow.reverse();
 
-      ordersWithRow.forEach(function(entry) {
-        var o = entry.item;
-        var rIndex = entry.rowIndex;
+      rawOrders.forEach(function(o, idx) {
+        var orderId = o.id || (idx + 2);
+        var createdAt = o.created_at || o[0] || new Date().toISOString();
+        var customerName = o.customer_name || o[1] || '';
+        var phoneStr = String(o.phone || o[2] || '').trim();
+        if (phoneStr && !phoneStr.startsWith('0') && !phoneStr.startsWith('+')) {
+          phoneStr = '0' + phoneStr;
+        }
+        var addressStr = o.address || o[3] || '';
+        var totalAmount = Number(o.total || o[4] || 0);
+        var rawPay = String(o.payment_method || o[5] || '');
+        var itemsData = o.items || o[6] || [];
+        var status = o.status || o[8] || 'Pending';
 
-        var status = o[8] || 'Pending';
-        if (status === 'Confirmed' || status === 'Paid') totalSales += Number(o[4]);
+        if (status === 'Confirmed' || status === 'Paid') totalSales += totalAmount;
         if (status === 'Pending') pendingCount++;
         
         var badgeClass = status === 'Confirmed' ? 'badge-in' : (status === 'Cancelled' ? 'badge-out' : 'badge');
@@ -257,7 +263,6 @@
         if(status === 'Paid') badgeClass = 'badge-in';
         if(status === 'Failed') badgeClass = 'badge-out';
 
-        var rawPay = String(o[5] || '');
         var paymentMethod = '💵 نقداً عند الاستلام';
         if (rawPay.indexOf('paymob') !== -1) {
           paymentMethod = '<span style="color:#2980b9; font-weight:bold;">💳 Paymob (بطاقة بنكية)</span>';
@@ -270,26 +275,30 @@
           paymentMethod = rawPay;
         }
 
-        var phoneStr = String(o[2] || '').trim();
-        if (phoneStr && !phoneStr.startsWith('0') && !phoneStr.startsWith('+')) {
-          phoneStr = '0' + phoneStr;
-        }
+        var addressHTML = String(addressStr).replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color:#7E7AE0; text-decoration:underline; font-weight:bold;">فتح الموقع على الخريطة</a>').replace(/\n/g, '<br>');
 
-        var addressHTML = String(o[3]).replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color:#7E7AE0; text-decoration:underline; font-weight:bold;">فتح الموقع على الخريطة</a>').replace(/\n/g, '<br>');
+        var itemsDisplay = '';
+        if (Array.isArray(itemsData)) {
+          itemsDisplay = itemsData.map(function(it) {
+            return (it.quantity || 1) + 'x ' + (it.title || '') + ' (تفاصيل: ' + (it.size || '') + ')';
+          }).join('\n');
+        } else {
+          itemsDisplay = String(itemsData);
+        }
 
         var tr = document.createElement('tr');
         tr.innerHTML = 
-          '<td>' + new Date(o[0]).toLocaleDateString('ar-EG', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) + '</td>' +
-          '<td><strong>' + o[1] + '</strong><br><small>' + addressHTML + '</small></td>' +
+          '<td>' + new Date(createdAt).toLocaleDateString('ar-EG', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) + '</td>' +
+          '<td><strong>' + customerName + '</strong><br><small>' + addressHTML + '</small></td>' +
           '<td dir="ltr" style="font-weight:600;">' + phoneStr + '</td>' +
           '<td>' + paymentMethod + '</td>' +
-          '<td><pre style="font-family:inherit; margin:0; font-size:0.85rem; white-space:pre-wrap;">' + o[6] + '</pre></td>' +
-          '<td><strong>' + o[4] + ' ج.م</strong></td>' +
+          '<td><pre style="font-family:inherit; margin:0; font-size:0.85rem; white-space:pre-wrap;">' + itemsDisplay + '</pre></td>' +
+          '<td><strong>' + totalAmount + ' ج.م</strong></td>' +
           '<td><span class="badge ' + badgeClass + '">' + status + '</span></td>' +
           '<td>' +
-            '<button onclick="updateOrder(' + rIndex + ', \'Confirmed\')" class="admin-btn btn-success">تأكيد</button>' +
-            '<button onclick="updateOrder(' + rIndex + ', \'Cancelled\')" class="admin-btn btn-warning">إلغاء</button>' +
-            '<button onclick="deleteOrder(' + rIndex + ')" class="admin-btn btn-danger">حذف</button>' +
+            '<button onclick="updateOrder(\'' + orderId + '\', \'Confirmed\')" class="admin-btn btn-success">تأكيد</button>' +
+            '<button onclick="updateOrder(\'' + orderId + '\', \'Cancelled\')" class="admin-btn btn-warning">إلغاء</button>' +
+            '<button onclick="deleteOrder(\'' + orderId + '\')" class="admin-btn btn-danger">حذف</button>' +
           '</td>';
         tbody.appendChild(tr);
       });
@@ -343,15 +352,15 @@
       if (res.success) { loadTable(); } else { alert('خطأ: ' + (res.error || 'غير مصرح')); }
     }
     
-    async function updateOrder(rowIndex, newStatus) {
+    async function updateOrder(orderId, newStatus) {
       if(!confirm('هل أنت متأكد من تغيير حالة الطلب إلى ' + newStatus + '؟')) return;
-      var res = await adminAction('update_order', { rowIndex: rowIndex, status: newStatus }, pwd);
+      var res = await adminAction('update_order', { orderId: orderId, status: newStatus }, pwd);
       if (res.success) { loadOrders(); } else { alert('خطأ: ' + (res.error || 'غير مصرح')); }
     }
 
-    async function deleteOrder(rowIndex) {
+    async function deleteOrder(orderId) {
       if(!confirm('هل أنت متأكد من حذف الطلب نهائياً؟')) return;
-      var res = await adminAction('delete_order', { rowIndex: rowIndex }, pwd);
+      var res = await adminAction('delete_order', { orderId: orderId }, pwd);
       if (res.success) { loadOrders(); } else { alert('خطأ: ' + (res.error || 'غير مصرح')); }
     }
 

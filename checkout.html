@@ -7,6 +7,8 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-client.js"></script>
 </head>
 <body>
   <nav>
@@ -15,7 +17,14 @@
       <div class="nav-right">
         <a href="shop.html">الكولكشن</a>
         <a href="index.html#why">ليه احنا</a>
-        <a href="https://www.facebook.com/share/19TZ1tcnnn/" target="_blank" rel="noopener">صفحتنا</a>
+        <div class="nav-socials">
+          <a href="https://www.facebook.com/share/19TZ1tcnnn/" target="_blank" rel="noopener" class="nav-social-link" title="فيسبوك">
+            <svg viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </a>
+          <a href="https://www.instagram.com/" target="_blank" rel="noopener" class="nav-social-link" title="إنستجرام">
+            <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+          </a>
+        </div>
         <a href="cart.html" class="cart-link">السلة <span class="cart-count">0</span></a>
       </div>
       <button class="burger" aria-label="القائمة">
@@ -54,7 +63,10 @@
               <input type="tel" id="c-phone" class="checkout-input" required>
             </div>
             <div class="checkout-field">
-              <label class="checkout-label">حدد موقعك على الخريطة</label>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <label class="checkout-label" style="margin-bottom:0;">حدد موقعك على الخريطة</label>
+                <button type="button" onclick="locateUserCheckout()" style="background:none; border:none; color:#7E7AE0; font-size:0.82rem; font-weight:bold; cursor:pointer; font-family:inherit;">📍 تحديد موقعي الحالي</button>
+              </div>
               <div id="map" style="height: 250px; border-radius: 8px; border: 1px solid #ddd; z-index: 1;"></div>
               <p style="font-size: 0.8rem; color: #666; margin-top: 5px;">اسحب العلامة الزرقاء لتحديد موقعك بدقة (إجباري لتوصيل الطلب)</p>
             </div>
@@ -122,6 +134,9 @@
   <script src="api.js"></script>
   <script src="cart.js"></script>
   <script>
+    var map, marker;
+    window.mapLocation = null;
+
     document.addEventListener('DOMContentLoaded', function() {
       setTimeout(function() {
         if (Cart.items.length === 0) {
@@ -134,7 +149,7 @@
           var row = document.createElement('div');
           row.className = 'checkout-sidebar-item';
           row.innerHTML =
-            '<span class="checkout-sidebar-item-name">' + item.quantity + 'x ' + item.title + ' (' + item.size + ')</span>' +
+            '<span class="checkout-sidebar-item-name">' + item.quantity + 'x ' + item.title + ' (تفاصيل: ' + item.size + ')</span>' +
             '<span class="checkout-sidebar-item-price">' + (item.price * item.quantity) + ' ج.م</span>';
           itemsContainer.appendChild(row);
         });
@@ -143,6 +158,8 @@
         document.getElementById('co-total').textContent = total + ' ج.م';
         document.getElementById('co-final').textContent = total + ' ج.م';
       }, 50);
+
+      initCheckoutMap();
 
       var form = document.getElementById('checkoutForm');
       form.addEventListener('submit', async function(e) {
@@ -207,6 +224,54 @@
       });
     });
 
+    function initCheckoutMap() {
+      setTimeout(function() {
+        var defaultLat = 30.0444;
+        var defaultLng = 31.2357;
+        window.mapLocation = defaultLat + ',' + defaultLng;
+
+        map = L.map('map').setView([defaultLat, defaultLng], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+        
+        marker = L.marker([defaultLat, defaultLng], {draggable: true}).addTo(map);
+        
+        marker.on('dragend', function() {
+          var position = marker.getLatLng();
+          window.mapLocation = position.lat + ',' + position.lng;
+        });
+        
+        map.on('click', function(e) {
+          marker.setLatLng(e.latlng);
+          window.mapLocation = e.latlng.lat + ',' + e.latlng.lng;
+        });
+      }, 150);
+    }
+
+    function setMapLocation(lat, lng) {
+      if (map && marker) {
+        map.setView([lat, lng], 15);
+        marker.setLatLng([lat, lng]);
+        window.mapLocation = lat + ',' + lng;
+      }
+    }
+
+    function locateUserCheckout() {
+      if (!navigator.geolocation) {
+        alert('خاصية تحديد الموقع غير مدعومة في متصفحك.');
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        function(pos) {
+          setMapLocation(pos.coords.latitude, pos.coords.longitude);
+        },
+        function() {
+          alert('تعذر تحديد موقعك الحالي. يرجى سحب العلامة على الخريطة يدوياً.');
+        }
+      );
+    }
+
     function togglePaymentBox() {
       var instapayChecked = document.querySelector('input[name="payment"][value="instapay"]').checked;
       var box = document.getElementById('instapay-box');
@@ -228,28 +293,6 @@
         }, 2000);
       });
     }
-
-    var map, marker;
-    window.mapLocation = null;
-    
-    setTimeout(function() {
-      map = L.map('map').setView([30.0444, 31.2357], 12);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
-      }).addTo(map);
-      
-      marker = L.marker([30.0444, 31.2357], {draggable: true}).addTo(map);
-      
-      marker.on('dragend', function() {
-        var position = marker.getLatLng();
-        window.mapLocation = position.lat + ',' + position.lng;
-      });
-      
-      map.on('click', function(e) {
-        marker.setLatLng(e.latlng);
-        window.mapLocation = e.latlng.lat + ',' + e.latlng.lng;
-      });
-    }, 200);
 
     var burger = document.querySelector('.burger');
     var navRight = document.querySelector('.nav-right');
