@@ -187,12 +187,15 @@
       }
 
       var sizeSelect = document.getElementById('size');
-      var sizes = Array.isArray(currentProduct.sizes) && currentProduct.sizes.length > 0 ? currentProduct.sizes : ['عادي'];
+      var sizes = Array.isArray(currentProduct.sizes) && currentProduct.sizes.length > 0 
+        ? currentProduct.sizes 
+        : (currentProduct.sizes ? String(currentProduct.sizes).split(',').map(s => s.trim()) : ['عادي']);
       sizes.forEach(function(s, idx) {
         var opt = document.createElement('option');
         opt.value = s;
-        opt.dataset.price = window.productPrices[idx] || window.productPrices[0];
-        opt.textContent = s;
+        var pPrice = window.productPrices[idx] || window.productPrices[0] || currentProduct.price;
+        opt.dataset.price = pPrice;
+        opt.textContent = s + (window.productPrices.length > 1 ? ' (' + pPrice + ' ج.م)' : '');
         sizeSelect.appendChild(opt);
       });
 

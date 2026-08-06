@@ -74,6 +74,88 @@
       justify-content: center;
     }
 
+    /* Sheet / Table for variants & pricing */
+    .sheet-card {
+      background: #ffffff;
+      border: 1px solid #eae6e1;
+      border-radius: 10px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    }
+    .sheet-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .sheet-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .sheet-table th {
+      background: #faf8f5;
+      padding: 10px 12px;
+      font-size: 0.85rem;
+      color: #666;
+      border-bottom: 1px solid #eee;
+      text-align: right;
+    }
+    .sheet-table td {
+      padding: 8px 10px;
+      border-bottom: 1px solid #f4f2ef;
+    }
+    .sheet-row-del-btn {
+      background: #fdedec;
+      color: #e74c3c;
+      border: 1px solid #fadbd8;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      transition: all 0.2s;
+    }
+    .sheet-row-del-btn:hover {
+      background: #e74c3c;
+      color: #ffffff;
+    }
+
+    /* Edit Modal */
+    .admin-modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 20px;
+    }
+    .admin-modal.open {
+      display: flex;
+    }
+    .modal-box {
+      background: #ffffff;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 800px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 14px;
+      margin-bottom: 20px;
+    }
+
     .view-section { display: none; }
     .view-section.active { display: block; }
     .stat-cards { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 20px; }
@@ -130,13 +212,32 @@
                 <option value="babies">رضع</option>
               </select>
             </div>
-            <div class="form-group">
-              <label>السعر (ج.م)</label>
-              <input type="text" id="n-price" placeholder="مثال: 150 أو 150,160,170" required>
-            </div>
-            <div class="form-group">
-              <label>التفاصيل (مفصولة بفاصلة)</label>
-              <input type="text" id="n-sizes" placeholder="مثال: 2Y, 4Y, 6Y أو أحمر، أزرق" required>
+
+            <!-- Dynamic Variants Sheet / Table -->
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <div class="sheet-card">
+                <div class="sheet-header">
+                  <div>
+                    <strong style="font-size: 0.95rem; color:#2c2c2c;">جدول التفاصيل والأسعار (المقاسات / الألوان والأسعار)</strong>
+                    <p style="font-size: 0.8rem; color: #888; margin-top: 2px;">أضف كل تفصيل أو مقاس وسعره الخاص في سطر منفصل</p>
+                  </div>
+                  <button type="button" onclick="addVariantRow('add-variants-tbody')" class="admin-btn btn-outline" style="margin:0; font-weight: bold;">+ إضافة خيار جديد</button>
+                </div>
+                <div style="overflow-x:auto;">
+                  <table class="sheet-table">
+                    <thead>
+                      <tr>
+                        <th style="width: 55%;">اسم التفصيل (المقاس / اللون / النوع)</th>
+                        <th style="width: 35%;">السعر (ج.م)</th>
+                        <th style="width: 10%; text-align: center;">حذف</th>
+                      </tr>
+                    </thead>
+                    <tbody id="add-variants-tbody">
+                      <!-- Rows dynamically rendered -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
 
             <!-- Main Image Upload -->
@@ -185,7 +286,7 @@
         <table class="admin-table">
           <thead>
             <tr>
-              <th>صورة</th><th>الاسم</th><th>القسم</th><th>السعر</th><th>الحالة</th><th>إجراءات</th>
+              <th>صورة</th><th>الاسم</th><th>القسم</th><th>التفاصيل والأسعار</th><th>الحالة</th><th>إجراءات</th>
             </tr>
           </thead>
           <tbody id="admin-table-body">
@@ -200,27 +301,34 @@
       <div class="stat-cards">
         <div class="stat-card">
           <div class="stat-value" id="stat-orders">0</div>
-          <div>إجمالي الطلبات</div>
+          <div class="stat-label">إجمالي الطلبات</div>
         </div>
         <div class="stat-card">
           <div class="stat-value" id="stat-sales">0 ج.م</div>
-          <div>إجمالي المبيعات المؤكدة</div>
+          <div class="stat-label">إجمالي المبيعات المؤكدة</div>
         </div>
         <div class="stat-card">
           <div class="stat-value" id="stat-pending">0</div>
-          <div>طلبات قيد الانتظار</div>
+          <div class="stat-label">طلبات في الانتظار</div>
         </div>
       </div>
-      
-      <div style="margin-bottom: 20px;">
-        <input type="text" id="order-search" placeholder="بحث باسم العميل أو رقم الهاتف..." onkeyup="filterOrders()" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit;">
+
+      <div style="margin-bottom: 20px; display: flex; gap: 10px;">
+        <input type="text" id="order-search" placeholder="بحث باسم العميل أو رقم الهاتف..." onkeyup="filterOrders()" style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
       </div>
-      
+
       <div style="overflow-x: auto;">
         <table class="admin-table">
           <thead>
             <tr>
-              <th>التاريخ</th><th>العميل</th><th>رقم الهاتف</th><th>الدفع</th><th>المنتجات</th><th>الإجمالي</th><th>حالة الطلب</th><th>إجراءات</th>
+              <th>التاريخ</th>
+              <th>العميل</th>
+              <th>الهاتف</th>
+              <th>طريقة الدفع</th>
+              <th>المنتجات والتفاصيل</th>
+              <th>الإجمالي</th>
+              <th>الحالة</th>
+              <th>إجراءات</th>
             </tr>
           </thead>
           <tbody id="orders-table-body">
@@ -231,19 +339,160 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase-client.js"></script>
+  <!-- Edit Product Modal -->
+  <div id="edit-modal" class="admin-modal">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h3 style="margin: 0;">تعديل المنتج</h3>
+        <button type="button" onclick="closeEditModal()" style="background:none; border:none; font-size:1.4rem; cursor:pointer; color:#888;">✕</button>
+      </div>
+      <form id="editProductForm" onsubmit="handleEditSubmit(event)">
+        <input type="hidden" id="edit-p-id">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>اسم المنتج</label>
+            <input type="text" id="edit-p-title" required>
+          </div>
+          <div class="form-group">
+            <label>القسم</label>
+            <select id="edit-p-cat" required>
+              <option value="boys">ولادي</option>
+              <option value="girls">بناتي</option>
+              <option value="babies">رضع</option>
+            </select>
+          </div>
+
+          <!-- Edit Variants Sheet -->
+          <div class="form-group" style="grid-column: 1 / -1;">
+            <div class="sheet-card">
+              <div class="sheet-header">
+                <div>
+                  <strong style="font-size: 0.95rem; color:#2c2c2c;">جدول التفاصيل والأسعار</strong>
+                  <p style="font-size: 0.8rem; color: #888; margin-top: 2px;">تعديل تفاصيل وأسعار المنتج</p>
+                </div>
+                <button type="button" onclick="addVariantRow('edit-variants-tbody')" class="admin-btn btn-outline" style="margin:0; font-weight: bold;">+ إضافة خيار جديد</button>
+              </div>
+              <div style="overflow-x:auto;">
+                <table class="sheet-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 55%;">اسم التفصيل (المقاس / اللون / النوع)</th>
+                      <th style="width: 35%;">السعر (ج.م)</th>
+                      <th style="width: 10%; text-align: center;">حذف</th>
+                    </tr>
+                  </thead>
+                  <tbody id="edit-variants-tbody">
+                    <!-- Rows dynamically rendered -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group" style="grid-column: 1 / -1;">
+            <label>رابط الصورة الرئيسية</label>
+            <input type="text" id="edit-p-image" required>
+          </div>
+          <div class="form-group" style="grid-column: 1 / -1;">
+            <label>روابط الصور الإضافية (مفصولة بفاصلة)</label>
+            <input type="text" id="edit-p-images">
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:10px;">
+          <label>الوصف</label>
+          <textarea id="edit-p-desc" rows="3" required></textarea>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+          <button type="submit" class="admin-btn btn-success" id="edit-save-btn" style="padding: 10px 24px; font-weight: bold;">حفظ التعديلات</button>
+          <button type="button" onclick="closeEditModal()" class="admin-btn btn-outline" style="padding: 10px 20px;">إلغاء</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script src="api.js"></script>
   <script>
-    var pwd = sessionStorage.getItem('admin_pwd');
-    if (pwd) showDashboard();
-
+    var pwd = '';
     var uploadedMainImageData = '';
     var uploadedSubImagesData = [];
+    var allProductsCache = [];
 
-    function compressImage(file, maxWidth, quality) {
-      maxWidth = maxWidth || 1000;
-      quality = quality || 0.82;
+    document.addEventListener('DOMContentLoaded', function() {
+      var savedPwd = sessionStorage.getItem('admin_pwd');
+      if (savedPwd) {
+        pwd = savedPwd;
+        showDashboard();
+      }
+      resetVariantTable('add-variants-tbody');
+    });
+
+    // Variants Sheet Table Functions
+    function addVariantRow(tbodyId, detailVal, priceVal) {
+      var tbody = document.getElementById(tbodyId || 'add-variants-tbody');
+      if (!tbody) return;
+      var tr = document.createElement('tr');
+      tr.className = 'variant-row';
+      tr.innerHTML = 
+        '<td>' +
+          '<input type="text" class="variant-name" placeholder="مثال: 2Y أو سنة إلى سنتين أو أحمر" value="' + (detailVal !== undefined ? detailVal : '') + '" style="width:100%; padding:9px 12px; border:1px solid #ddd; border-radius:6px; font-family:inherit; font-size:0.9rem;" required>' +
+        '</td>' +
+        '<td>' +
+          '<input type="number" class="variant-price" placeholder="مثال: 150" value="' + (priceVal !== undefined ? priceVal : '') + '" style="width:100%; padding:9px 12px; border:1px solid #ddd; border-radius:6px; font-family:inherit; font-size:0.9rem;" required>' +
+        '</td>' +
+        '<td style="text-align:center;">' +
+          '<button type="button" class="sheet-row-del-btn" onclick="removeVariantRow(this)" title="حذف السطر">✕</button>' +
+        '</td>';
+      tbody.appendChild(tr);
+    }
+
+    function removeVariantRow(btn) {
+      var tbody = btn.closest('tbody');
+      var rows = tbody.querySelectorAll('tr');
+      if (rows.length <= 1) {
+        var row = btn.closest('tr');
+        row.querySelector('.variant-name').value = '';
+        row.querySelector('.variant-price').value = '';
+        return;
+      }
+      btn.closest('tr').remove();
+    }
+
+    function resetVariantTable(tbodyId, initialList) {
+      var tbody = document.getElementById(tbodyId || 'add-variants-tbody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+      if (Array.isArray(initialList) && initialList.length > 0) {
+        initialList.forEach(function(item) {
+          addVariantRow(tbodyId, item.name, item.price);
+        });
+      } else {
+        addVariantRow(tbodyId, 'عادي', '');
+      }
+    }
+
+    function collectVariantsFromTable(tbodyId) {
+      var tbody = document.getElementById(tbodyId);
+      if (!tbody) return { sizes: [], prices: [] };
+      var rows = tbody.querySelectorAll('tr');
+      var sizes = [];
+      var prices = [];
+      rows.forEach(function(r) {
+        var nameInput = r.querySelector('.variant-name');
+        var priceInput = r.querySelector('.variant-price');
+        if (nameInput && priceInput) {
+          var n = nameInput.value.trim();
+          var p = priceInput.value.trim();
+          if (n || p) {
+            sizes.push(n || 'عادي');
+            prices.push(p || '0');
+          }
+        }
+      });
+      return { sizes: sizes, prices: prices };
+    }
+
+    // Client-side image compression
+    function compressImage(file, maxWidth = 1000, quality = 0.75) {
       return new Promise(function(resolve, reject) {
         var reader = new FileReader();
         reader.readAsDataURL(file);
@@ -367,7 +616,13 @@
     }
 
     function logout() { sessionStorage.removeItem('admin_pwd'); window.location.reload(); }
-    function toggleAddForm() { document.getElementById('add-form').classList.toggle('active'); }
+    function toggleAddForm() { 
+      var f = document.getElementById('add-form');
+      f.classList.toggle('active');
+      if (f.classList.contains('active')) {
+        resetVariantTable('add-variants-tbody');
+      }
+    }
     
     function switchTab(viewId, el) {
       document.querySelectorAll('.view-section').forEach(function(s) { s.classList.remove('active'); });
@@ -394,6 +649,7 @@
       tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">جاري التحميل...</td></tr>';
       
       var products = await fetchProducts();
+      allProductsCache = products || [];
       tbody.innerHTML = '';
       if (products.length === 0) {
         tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">لا توجد منتجات.</td></tr>';
@@ -402,16 +658,89 @@
       products.forEach(function(p) {
         var tr = document.createElement('tr');
         var isOut = p.status === 'out_of_stock';
+
+        // Format details & prices
+        var sizesList = Array.isArray(p.sizes) ? p.sizes : String(p.sizes || '').split(',').map(s => s.trim());
+        var pricesList = String(p.price || '').split(',').map(s => s.trim());
+        var variantsText = sizesList.map(function(s, idx) {
+          var pr = pricesList[idx] || pricesList[0] || '';
+          return s + (pr ? (' (' + pr + ' ج.م)') : '');
+        }).join(' - ');
+
         tr.innerHTML = 
           '<td><img src="' + p.image + '" style="width:40px; height:50px; object-fit:cover; border-radius:4px;"></td>' +
-          '<td>' + p.title + '</td><td>' + p.category + '</td><td>' + p.price + '</td>' +
+          '<td><strong>' + p.title + '</strong></td>' +
+          '<td>' + (p.category === 'boys' ? 'ولادي' : (p.category === 'girls' ? 'بناتي' : 'رضع')) + '</td>' +
+          '<td><small style="color:#555; line-height:1.4; display:block;">' + variantsText + '</small></td>' +
           '<td><span class="badge ' + (isOut ? 'badge-out' : 'badge-in') + '">' + (isOut ? 'نفذت الكمية' : 'متوفر') + '</span></td>' +
           '<td>' +
+            '<button onclick="openEditModal(\'' + p.id + '\')" class="admin-btn btn-outline">تعديل</button>' +
             '<button onclick="toggleStock(\'' + p.id + '\', ' + isOut + ')" class="admin-btn ' + (isOut ? 'btn-success' : 'btn-warning') + '">' + (isOut ? 'إعادة توفير' : 'إخفاء') + '</button>' +
             '<button onclick="deleteProd(\'' + p.id + '\')" class="admin-btn btn-danger">حذف</button>' +
           '</td>';
         tbody.appendChild(tr);
       });
+    }
+
+    function openEditModal(prodId) {
+      var prod = allProductsCache.find(function(p) { return String(p.id) === String(prodId); });
+      if (!prod) return;
+
+      document.getElementById('edit-p-id').value = prod.id;
+      document.getElementById('edit-p-title').value = prod.title || '';
+      document.getElementById('edit-p-cat').value = prod.category || 'boys';
+      document.getElementById('edit-p-image').value = prod.image || '';
+      document.getElementById('edit-p-images').value = (prod.images || []).join(', ');
+      document.getElementById('edit-p-desc').value = prod.description || '';
+
+      var sizes = Array.isArray(prod.sizes) ? prod.sizes : String(prod.sizes || '').split(',').map(s => s.trim());
+      var prices = String(prod.price || '').split(',').map(s => s.trim());
+      var list = sizes.map(function(s, idx) {
+        return { name: s, price: prices[idx] || prices[0] || '' };
+      });
+
+      resetVariantTable('edit-variants-tbody', list);
+      document.getElementById('edit-modal').classList.add('open');
+    }
+
+    function closeEditModal() {
+      document.getElementById('edit-modal').classList.remove('open');
+    }
+
+    async function handleEditSubmit(e) {
+      e.preventDefault();
+      var prodId = document.getElementById('edit-p-id').value;
+      var variantsData = collectVariantsFromTable('edit-variants-tbody');
+      if (variantsData.sizes.length === 0) {
+        alert('يرجى إضافة تفصيل وسعر واحد على الأقل للمنتج.');
+        return;
+      }
+
+      var btn = document.getElementById('edit-save-btn');
+      btn.disabled = true; btn.textContent = 'جاري الحفظ...';
+
+      var subImgsRaw = document.getElementById('edit-p-images').value.trim();
+      var subImgs = subImgsRaw ? subImgsRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+      var editData = {
+        id: prodId,
+        title: document.getElementById('edit-p-title').value.trim(),
+        category: document.getElementById('edit-p-cat').value,
+        price: variantsData.prices.join(', '),
+        sizes: variantsData.sizes,
+        image: document.getElementById('edit-p-image').value.trim(),
+        images: subImgs,
+        description: document.getElementById('edit-p-desc').value.trim()
+      };
+
+      var res = await adminAction('edit_product', editData, pwd);
+      if (res.success) {
+        closeEditModal();
+        loadTable();
+      } else {
+        alert('خطأ أثناء التعديل: ' + (res.error || 'يرجى المحاولة مجدداً'));
+      }
+      btn.disabled = false; btn.textContent = 'حفظ التعديلات';
     }
 
     async function loadOrders(cachedOrders) {
@@ -516,6 +845,12 @@
         return;
       }
 
+      var variantsData = collectVariantsFromTable('add-variants-tbody');
+      if (variantsData.sizes.length === 0) {
+        alert('يرجى إضافة تفصيل وسعر واحد على الأقل للمنتج.');
+        return;
+      }
+
       var btn = document.getElementById('add-btn');
       btn.disabled = true; btn.textContent = 'جاري الحفظ...';
 
@@ -524,8 +859,8 @@
       var newProd = {
         title: document.getElementById('n-title').value.trim(),
         category: document.getElementById('n-cat').value,
-        price: document.getElementById('n-price').value.trim(),
-        sizes: document.getElementById('n-sizes').value.trim(),
+        price: variantsData.prices.join(', '),
+        sizes: variantsData.sizes,
         image: mainImg,
         images: subImgs,
         description: document.getElementById('n-desc').value.trim(),
@@ -537,6 +872,7 @@
         clearMainImage();
         uploadedSubImagesData = [];
         renderSubPreviews();
+        resetVariantTable('add-variants-tbody');
         toggleAddForm(); 
         loadTable();
       } else {

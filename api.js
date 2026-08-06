@@ -168,13 +168,18 @@ async function adminAction(action, payloadData, password) {
 
     if (action === 'add_product') {
       const newId = 'p_' + Date.now();
-      const sizesArr = String(payloadData.sizes || '').split(',').map(s => s.trim()).filter(Boolean);
-      const imagesArr = payloadData.images ? String(payloadData.images).split(',').map(s => s.trim()).filter(Boolean) : [payloadData.image];
+      const sizesArr = Array.isArray(payloadData.sizes)
+        ? payloadData.sizes
+        : String(payloadData.sizes || '').split(',').map(s => s.trim()).filter(Boolean);
+      const imagesArr = Array.isArray(payloadData.images)
+        ? payloadData.images
+        : (payloadData.images ? String(payloadData.images).split(',').map(s => s.trim()).filter(Boolean) : [payloadData.image]);
+      const priceVal = Array.isArray(payloadData.price) ? payloadData.price.join(', ') : String(payloadData.price || '');
       const { error } = await sb.from('products').insert([{
         id: newId,
         title: payloadData.title,
         category: payloadData.category,
-        price: payloadData.price,
+        price: priceVal,
         sizes: sizesArr,
         image: payloadData.image,
         images: imagesArr,
@@ -182,6 +187,29 @@ async function adminAction(action, payloadData, password) {
         status: 'in_stock',
         created_at: new Date().toISOString()
       }]);
+      if (error) return { success: false, error: error.message };
+      return { success: true };
+    }
+
+    if (action === 'edit_product') {
+      const sizesArr = Array.isArray(payloadData.sizes)
+        ? payloadData.sizes
+        : String(payloadData.sizes || '').split(',').map(s => s.trim()).filter(Boolean);
+      const imagesArr = Array.isArray(payloadData.images)
+        ? payloadData.images
+        : (payloadData.images ? String(payloadData.images).split(',').map(s => s.trim()).filter(Boolean) : [payloadData.image]);
+      const priceVal = Array.isArray(payloadData.price) ? payloadData.price.join(', ') : String(payloadData.price || '');
+      const updatePayload = {
+        title: payloadData.title,
+        category: payloadData.category,
+        price: priceVal,
+        sizes: sizesArr,
+        description: payloadData.description
+      };
+      if (payloadData.image) updatePayload.image = payloadData.image;
+      if (payloadData.images && payloadData.images.length > 0) updatePayload.images = imagesArr;
+
+      const { error } = await sb.from('products').update(updatePayload).eq('id', payloadData.id);
       if (error) return { success: false, error: error.message };
       return { success: true };
     }
