@@ -86,6 +86,39 @@ async function submitOrder(orderData) {
       return { success: false, error: error.message };
     }
 
+    // Send email notification to kiddo.boutique0@gmail.com asynchronously
+    try {
+      var itemsFormatted = Array.isArray(newOrder.items) 
+        ? newOrder.items.map(function(it) { return (it.quantity || 1) + 'x ' + it.title + ' (تفاصيل: ' + (it.size || 'عادي') + ') - ' + it.price + ' ج.م'; }).join('\n')
+        : String(newOrder.items || '');
+
+      var emailPayload = {
+        _subject: 'طلب جديد #' + newOrder.id + ' - Kiddo Boutique',
+        _template: 'table',
+        _captcha: 'false',
+        'رقم الطلب': newOrder.id,
+        'اسم العميل': newOrder.customer_name,
+        'رقم الهاتف': newOrder.phone,
+        'العنوان': newOrder.address,
+        'طريقة الدفع': newOrder.payment_method,
+        'المنتجات': itemsFormatted,
+        'الإجمالي': newOrder.total + ' ج.م',
+        'تاريخ الطلب': new Date().toLocaleString('ar-EG')
+      };
+
+      fetch('https://formsubmit.co/ajax/kiddo.boutique0@gmail.com', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(emailPayload)
+      }).catch(function() {});
+
+      fetch('/api/notify-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newOrder)
+      }).catch(function() {});
+    } catch(emailErr) {}
+
     if (orderData.payment === 'paymob') {
       try {
         const paymobRes = await fetch('/api/paymob', {
