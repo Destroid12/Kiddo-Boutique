@@ -390,12 +390,34 @@
           </div>
 
           <div class="form-group" style="grid-column: 1 / -1;">
-            <label>رابط الصورة الرئيسية</label>
-            <input type="text" id="edit-p-image" required>
+            <label>الصورة الرئيسية للمنتج</label>
+            <div class="upload-zone" onclick="document.getElementById('edit-main-file').click()">
+              <input type="file" id="edit-main-file" accept="image/*" style="display:none;" onchange="handleEditMainFile(event)">
+              <div id="edit-main-upload-prompt">
+                <span style="font-size:0.95rem; font-weight:600; color:#7E7AE0;">اختر صورة رئيسية من جهازك</span>
+                <p style="font-size:0.8rem; color:#888; margin-top:4px;">اضغط هنا لاختيار الصورة</p>
+              </div>
+              <div id="edit-main-preview-area" style="display:none; margin-top:10px;">
+                <div class="preview-thumb-wrap">
+                  <img id="edit-main-preview-img" class="preview-thumb" src="" alt="Main Preview">
+                  <button type="button" class="preview-remove-btn" onclick="clearEditMainImage(event)">✕</button>
+                </div>
+              </div>
+            </div>
+            <input type="text" id="edit-p-image" placeholder="أو اكتب رابط الصورة (URL) مباشرة" style="margin-top: 8px;" oninput="handleEditMainUrlInput(this.value)">
           </div>
+
           <div class="form-group" style="grid-column: 1 / -1;">
-            <label>روابط الصور الإضافية (مفصولة بفاصلة)</label>
-            <input type="text" id="edit-p-images">
+            <label>الصور الإضافية للمنتج (معرض الصور)</label>
+            <div class="upload-zone" onclick="document.getElementById('edit-sub-files').click()">
+              <input type="file" id="edit-sub-files" accept="image/*" multiple style="display:none;" onchange="handleEditSubFiles(event)">
+              <div>
+                <span style="font-size:0.95rem; font-weight:600; color:#7E7AE0;">اختر صور إضافية من جهازك</span>
+                <p style="font-size:0.8rem; color:#888; margin-top:4px;">يمكنك اختيار صور متعددة معاً</p>
+              </div>
+            </div>
+            <div id="edit-sub-previews-container" style="display:flex; flex-wrap:wrap; margin-top:10px;"></div>
+            <input type="text" id="edit-p-images" placeholder="أو روابط صور إضافية مفصولة بفاصلة (,)" style="margin-top: 8px;" oninput="handleEditSubUrlsInput(this.value)">
           </div>
         </div>
         <div class="form-group" style="margin-top:10px;">
@@ -415,6 +437,8 @@
     var pwd = '';
     var uploadedMainImageData = '';
     var uploadedSubImagesData = [];
+    var editUploadedMainImageData = '';
+    var editUploadedSubImagesData = [];
     var allProductsCache = [];
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -597,6 +621,85 @@
       renderSubPreviews();
     }
 
+    async function handleEditMainFile(event) {
+      var file = event.target.files[0];
+      if (!file) return;
+      try {
+        var compressed = await compressImage(file);
+        editUploadedMainImageData = compressed;
+        document.getElementById('edit-main-preview-img').src = compressed;
+        document.getElementById('edit-main-preview-area').style.display = 'block';
+        document.getElementById('edit-main-upload-prompt').style.display = 'none';
+        document.getElementById('edit-p-image').value = '';
+      } catch (err) {
+        alert('تعذر تحميل الصورة، يرجى تجربة صورة أخرى.');
+      }
+    }
+
+    function clearEditMainImage(event) {
+      if (event) event.stopPropagation();
+      editUploadedMainImageData = '';
+      document.getElementById('edit-main-preview-img').src = '';
+      document.getElementById('edit-main-preview-area').style.display = 'none';
+      document.getElementById('edit-main-upload-prompt').style.display = 'block';
+      document.getElementById('edit-p-image').value = '';
+      document.getElementById('edit-main-file').value = '';
+    }
+
+    function handleEditMainUrlInput(val) {
+      if (val.trim()) {
+        editUploadedMainImageData = val.trim();
+        document.getElementById('edit-main-preview-img').src = val.trim();
+        document.getElementById('edit-main-preview-area').style.display = 'block';
+        document.getElementById('edit-main-upload-prompt').style.display = 'none';
+      } else {
+        clearEditMainImage();
+      }
+    }
+
+    async function handleEditSubFiles(event) {
+      var files = Array.from(event.target.files);
+      if (!files.length) return;
+      for (var i = 0; i < files.length; i++) {
+        try {
+          var compressed = await compressImage(files[i]);
+          editUploadedSubImagesData.push(compressed);
+        } catch (e) {}
+      }
+      renderEditSubPreviews();
+      document.getElementById('edit-sub-files').value = '';
+    }
+
+    function removeEditSubImage(index, event) {
+      if (event) event.stopPropagation();
+      editUploadedSubImagesData.splice(index, 1);
+      renderEditSubPreviews();
+    }
+
+    function renderEditSubPreviews() {
+      var container = document.getElementById('edit-sub-previews-container');
+      container.innerHTML = '';
+      editUploadedSubImagesData.forEach(function(src, idx) {
+        var wrap = document.createElement('div');
+        wrap.className = 'preview-thumb-wrap';
+        wrap.innerHTML = 
+          '<img class="preview-thumb" src="' + src + '">' +
+          '<button type="button" class="preview-remove-btn" onclick="removeEditSubImage(' + idx + ', event)">✕</button>';
+        container.appendChild(wrap);
+      });
+    }
+
+    function handleEditSubUrlsInput(val) {
+      if (!val.trim()) return;
+      var urls = val.split(',').map(function(s) { return s.trim(); }).filter(Boolean);
+      urls.forEach(function(u) {
+        if (editUploadedSubImagesData.indexOf(u) === -1) {
+          editUploadedSubImagesData.push(u);
+        }
+      });
+      renderEditSubPreviews();
+    }
+
     async function login() {
       var val = document.getElementById('admin-pwd').value;
       if (!val.trim()) return;
@@ -689,12 +792,28 @@
       document.getElementById('edit-p-id').value = prod.id;
       document.getElementById('edit-p-title').value = prod.title || '';
       document.getElementById('edit-p-cat').value = prod.category || 'boys';
-      document.getElementById('edit-p-image').value = prod.image || '';
-      document.getElementById('edit-p-images').value = (prod.images || []).join(', ');
       document.getElementById('edit-p-desc').value = prod.description || '';
 
-      var sizes = Array.isArray(prod.sizes) ? prod.sizes : String(prod.sizes || '').split(',').map(s => s.trim());
-      var prices = String(prod.price || '').split(',').map(s => s.trim());
+      editUploadedMainImageData = prod.image || '';
+      document.getElementById('edit-p-image').value = prod.image || '';
+      if (prod.image) {
+        document.getElementById('edit-main-preview-img').src = prod.image;
+        document.getElementById('edit-main-preview-area').style.display = 'block';
+        document.getElementById('edit-main-upload-prompt').style.display = 'none';
+      } else {
+        clearEditMainImage();
+      }
+
+      var subList = Array.isArray(prod.images) ? [...prod.images] : (prod.images ? String(prod.images).split(',').map(function(s) { return s.trim(); }).filter(Boolean) : []);
+      if (subList.length === 0 && prod.image) {
+        subList = [prod.image];
+      }
+      editUploadedSubImagesData = subList;
+      document.getElementById('edit-p-images').value = subList.join(', ');
+      renderEditSubPreviews();
+
+      var sizes = Array.isArray(prod.sizes) ? prod.sizes : String(prod.sizes || '').split(',').map(function(s) { return s.trim(); });
+      var prices = String(prod.price || '').split(',').map(function(s) { return s.trim(); });
       var list = sizes.map(function(s, idx) {
         return { name: s, price: prices[idx] || prices[0] || '' };
       });
@@ -716,11 +835,16 @@
         return;
       }
 
+      var mainImg = editUploadedMainImageData || document.getElementById('edit-p-image').value.trim();
+      if (!mainImg) {
+        alert('يرجى اختيار أو إدخال الصورة الرئيسية للمنتج.');
+        return;
+      }
+
       var btn = document.getElementById('edit-save-btn');
       btn.disabled = true; btn.textContent = 'جاري الحفظ...';
 
-      var subImgsRaw = document.getElementById('edit-p-images').value.trim();
-      var subImgs = subImgsRaw ? subImgsRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+      var subImgs = editUploadedSubImagesData.length > 0 ? editUploadedSubImagesData : [mainImg];
 
       var editData = {
         id: prodId,
@@ -728,7 +852,7 @@
         category: document.getElementById('edit-p-cat').value,
         price: variantsData.prices.join(', '),
         sizes: variantsData.sizes,
-        image: document.getElementById('edit-p-image').value.trim(),
+        image: mainImg,
         images: subImgs,
         description: document.getElementById('edit-p-desc').value.trim()
       };
